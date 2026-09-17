@@ -34,6 +34,12 @@ Built with Next.js (App Router), TypeScript, Tailwind CSS, and Supabase.
    "Confirm email" under Authentication → Providers → Email in your Supabase
    dashboard for faster local testing.
 
+## Deploying to Vercel
+
+The repo includes a minimal `vercel.json`; Vercel auto-detects Next.js, so no
+further configuration is required beyond the two Supabase environment
+variables. See the step-by-step walkthrough below.
+
 ## Project structure
 
 - `src/app/(app)/` — the authenticated app shell (dashboard, cycle, nutrition,
