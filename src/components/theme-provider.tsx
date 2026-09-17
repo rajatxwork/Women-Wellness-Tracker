@@ -25,7 +25,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
-    const stored = (localStorage.getItem("bloom-theme") as Theme) || "system";
+    const stored = (localStorage.getItem("selene-theme") as Theme) || "system";
     // eslint-disable-next-line react-hooks/set-state-in-effect -- reading the persisted theme requires browser APIs only available after mount
     setThemeState(stored);
   }, []);
@@ -48,7 +48,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [theme, applyTheme]);
 
   const setTheme = useCallback((t: Theme) => {
-    localStorage.setItem("bloom-theme", t);
+    localStorage.setItem("selene-theme", t);
     setThemeState(t);
   }, []);
 

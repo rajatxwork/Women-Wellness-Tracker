@@ -1,4 +1,4 @@
--- Bloom — Women's Wellness Tracker
+-- Selene — Women's Wellness Tracker
 -- Complete database schema for Supabase (Postgres + Row Level Security).
 -- Run this in the Supabase SQL editor on a fresh project.
 -- All user-data tables are scoped to auth.uid() via RLS policies.

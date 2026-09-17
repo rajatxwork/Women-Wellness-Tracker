@@ -17,14 +17,14 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Bloom — Your Wellness Journal",
+  title: "Selene — Your Wellness Journal",
   description:
     "A warm, everyday companion for tracking your cycle, nutrition, movement, and habits — at your own pace.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Bloom",
+    title: "Selene",
   },
 };
 
@@ -51,7 +51,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                const stored = localStorage.getItem('bloom-theme');
+                const stored = localStorage.getItem('selene-theme');
                 const theme = stored || 'system';
                 const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
                 if (isDark) document.documentElement.classList.add('dark');

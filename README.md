@@ -1,4 +1,4 @@
-# Bloom — Women's Wellness Tracker
+# Selene — Women's Wellness Tracker
 
 A warm, editorial companion app for the wellness e-book: cycle tracking, goal-based
 nutrition, a 3-day strength program, habits, tasks, and reflective analytics.

@@ -59,8 +59,8 @@ export function Sidebar({ userName }: { userName: string }) {
     <aside className="hidden md:flex md:w-64 md:flex-col md:border-r md:border-border md:bg-surface md:py-8 md:px-4">
       <div className="mb-8 px-3">
         <div className="flex items-center gap-2">
-          <span className="text-xl">🌿</span>
-          <span className="font-serif-display text-xl text-ink">Bloom</span>
+          <span className="text-xl">🌙</span>
+          <span className="font-serif-display text-xl text-ink">Selene</span>
         </div>
         <p className="mt-1 truncate px-0 text-sm text-ink-soft">Hi, {userName}</p>
       </div>
@@ -107,8 +107,8 @@ export function MobileHeader({ userName }: { userName: string }) {
   return (
     <header className="flex items-center justify-between border-b border-border bg-surface px-4 py-3 md:hidden">
       <div className="flex items-center gap-2">
-        <span className="text-lg">🌿</span>
-        <span className="font-serif-display text-lg text-ink">Bloom</span>
+        <span className="text-lg">🌙</span>
+        <span className="font-serif-display text-lg text-ink">Selene</span>
         <span className="text-xs text-ink-faint">· {userName}</span>
       </div>
       <div className="flex items-center gap-2">
