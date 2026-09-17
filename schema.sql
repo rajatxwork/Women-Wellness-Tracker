@@ -16,6 +16,7 @@ create table if not exists public.profiles (
   water_goal_ml int not null default 2000,
   age_band text check (age_band in ('20s-30s', '30s-50s', '60-plus')),
   onboarded boolean not null default false,
+  terms_accepted_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -777,3 +778,35 @@ drop trigger if exists profiles_set_updated_at on public.profiles;
 create trigger profiles_set_updated_at
   before update on public.profiles
   for each row execute function public.set_updated_at();
+
+-- ============================================================================
+-- DATA RETENTION: auto-delete the most sensitive data after 60 days
+-- ============================================================================
+-- Mood, period, and symptom data is deleted automatically two months after
+-- it's logged, since it's the most sensitive thing this app stores. Workout,
+-- nutrition, habit, and task data is not touched here and is kept
+-- indefinitely (nothing safety-sensitive about a lift log).
+--
+-- This requires the pg_cron extension. If the next statement errors with a
+-- permissions message, enable it instead via the Supabase dashboard:
+-- Database -> Extensions -> search "pg_cron" -> Enable, then re-run just the
+-- block below.
+create extension if not exists pg_cron;
+
+do $$
+begin
+  perform cron.unschedule(jobid)
+  from cron.job
+  where jobname = 'selene-delete-sensitive-data';
+exception when others then
+  null; -- no existing job to remove, or pg_cron isn't enabled yet
+end $$;
+
+select cron.schedule(
+  'selene-delete-sensitive-data',
+  '0 9 * * *', -- daily at 09:00 UTC
+  $$
+    delete from public.symptom_logs where log_date < (current_date - interval '60 days');
+    delete from public.cycle_logs where period_start < (current_date - interval '60 days');
+  $$
+);

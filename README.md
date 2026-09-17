@@ -13,11 +13,16 @@ Built with Next.js (App Router), TypeScript, Tailwind CSS, and Supabase.
    categories and movement pattern/exercise reference data extracted from the
    e-book.
 3. **Configure environment variables.** Copy `.env.local.example` to `.env.local`
-   and fill in your project's URL and anon key (Project Settings → API):
+   and fill in your project's URL, anon key, and service role key (all under
+   Project Settings → API):
 
    ```bash
    cp .env.local.example .env.local
    ```
+
+   The service role key powers account deletion (`src/lib/supabase/admin.ts`).
+   Keep it secret, it bypasses Row Level Security, and never expose it with a
+   `NEXT_PUBLIC_` prefix or from client code.
 
 4. **Install dependencies and run the dev server:**
 
@@ -48,12 +53,27 @@ Built with Next.js (App Router), TypeScript, Tailwind CSS, and Supabase.
    `NEXT_PUBLIC_SITE_URL` in your environment variables once you have a
    deployed URL, so reset emails link to the right place instead of
    `localhost`).
+7. **Enable pg_cron for data retention.** Period, symptom, and mood data is
+   automatically deleted 60 days after it's logged (see `schema.sql`, the
+   "DATA RETENTION" section near the bottom). This needs the `pg_cron`
+   extension enabled, either running as part of `schema.sql`, or if that
+   statement errors on permissions, via Database → Extensions → search
+   "pg_cron" → Enable in the Supabase dashboard, then re-run just that section
+   of `schema.sql`.
+
+**A note on the legal pages.** `/terms` and `/privacy` are real, considered
+drafts, not filler text, but they aren't a substitute for an actual lawyer.
+Given this app handles period and health data specifically, get them reviewed
+before real users sign up. Several US states (Washington's My Health My Data
+Act, for one) have specific, active legal requirements around reproductive
+health data.
 
 ## Deploying to Vercel
 
 The repo includes a minimal `vercel.json`; Vercel auto-detects Next.js, so no
-further configuration is required beyond the two Supabase environment
-variables. See the step-by-step walkthrough below.
+further configuration is required beyond the three Supabase environment
+variables (URL, anon key, service role key). See the step-by-step walkthrough
+below.
 
 ## Project structure
 

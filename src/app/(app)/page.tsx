@@ -97,13 +97,13 @@ export default async function DashboardPage() {
         </Card>
       )}
 
-      <div className="grid gap-6 sm:grid-cols-2">
-        <Card>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="lg:col-span-1">
           <h2 className="mb-4 font-serif-display text-lg text-ink">Water</h2>
           <WaterRing currentMl={waterTotal} goalMl={waterGoal} />
         </Card>
 
-        <Card>
+        <Card className="lg:col-span-1">
           <h2 className="mb-4 font-serif-display text-lg text-ink">Today&apos;s plan</h2>
           {plannedDay ? (
             <div className="space-y-3">
@@ -116,10 +116,8 @@ export default async function DashboardPage() {
             <p className="text-sm text-ink-faint">Rest, however you want to spend it.</p>
           )}
         </Card>
-      </div>
 
-      <div className="grid gap-6 sm:grid-cols-2">
-        <Card>
+        <Card className="lg:col-span-1">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-serif-display text-lg text-ink">Today&apos;s habits</h2>
             <Link href="/habits" className="text-xs font-semibold text-terracotta-deep">
@@ -129,7 +127,7 @@ export default async function DashboardPage() {
           <HabitChecklist habits={habitItems} />
         </Card>
 
-        <Card>
+        <Card className="lg:col-span-1">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-serif-display text-lg text-ink">Quick tasks</h2>
             <Link href="/habits?tab=tasks" className="text-xs font-semibold text-terracotta-deep">

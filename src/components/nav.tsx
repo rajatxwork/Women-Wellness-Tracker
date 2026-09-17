@@ -10,6 +10,7 @@ import {
   ListChecks,
   LineChart,
   LogOut,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -89,15 +90,24 @@ export function Sidebar({ userName }: { userName: string }) {
 
       <div className="mt-4 flex items-center justify-between px-1">
         <ThemeToggle />
-        <form action={logout}>
-          <button
-            type="submit"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:text-terracotta-deep"
-            aria-label="Sign out"
+        <div className="flex items-center gap-2">
+          <Link
+            href="/settings"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:text-terracotta-deep"
+            aria-label="Account and privacy settings"
           >
-            <LogOut size={18} />
-          </button>
-        </form>
+            <Settings size={18} />
+          </Link>
+          <form action={logout}>
+            <button
+              type="submit"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:text-terracotta-deep"
+              aria-label="Sign out"
+            >
+              <LogOut size={18} />
+            </button>
+          </form>
+        </div>
       </div>
     </aside>
   );
@@ -113,10 +123,17 @@ export function MobileHeader({ userName }: { userName: string }) {
       </div>
       <div className="flex items-center gap-2">
         <ThemeToggle />
+        <Link
+          href="/settings"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-ink-soft"
+          aria-label="Account and privacy settings"
+        >
+          <Settings size={16} />
+        </Link>
         <form action={logout}>
           <button
             type="submit"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-ink-soft"
             aria-label="Sign out"
           >
             <LogOut size={16} />

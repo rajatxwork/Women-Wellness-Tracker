@@ -35,11 +35,18 @@ export async function signup(
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
   const name = String(formData.get("name") ?? "");
+  const termsAccepted = formData.get("terms_accepted");
+
+  if (!termsAccepted) {
+    return { error: "You'll need to agree to the Terms of Service and Privacy Policy to continue." };
+  }
+
+  const termsAcceptedAt = new Date().toISOString();
 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { name } },
+    options: { data: { name, terms_accepted_at: termsAcceptedAt } },
   });
 
   if (error) {
@@ -80,6 +87,7 @@ export async function completeOnboarding(
   const name = String(formData.get("name") ?? "");
   const avgCycleLength = Number(formData.get("avg_cycle_length") ?? 28) || 28;
   const lastPeriodStart = String(formData.get("last_period_start") ?? "");
+  const termsAcceptedAt = (user.user_metadata?.terms_accepted_at as string | undefined) ?? null;
 
   const { error } = await supabase.from("profiles").upsert({
     id: user.id,
@@ -87,6 +95,7 @@ export async function completeOnboarding(
     avg_cycle_length: avgCycleLength,
     last_period_start: lastPeriodStart || null,
     onboarded: true,
+    terms_accepted_at: termsAcceptedAt,
   });
 
   if (error) {

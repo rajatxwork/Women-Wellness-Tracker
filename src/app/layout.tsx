@@ -1,20 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Nunito } from "next/font/google";
+import { Manrope, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
 // Only the weights/styles actually used in the app are loaded, since each
 // extra one is a render-blocking font file on first paint.
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
-  weight: ["400"],
-  style: ["normal"],
+  weight: ["700"],
   display: "swap",
 });
 
-const nunito = Nunito({
-  variable: "--font-nunito",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   display: "swap",
@@ -34,8 +33,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbf6f0" },
-    { media: "(prefers-color-scheme: dark)", color: "#241d1e" },
+    { media: "(prefers-color-scheme: light)", color: "#f4f2fb" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d0c16" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -48,7 +47,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${fraunces.variable} ${nunito.variable} h-full antialiased`}
+      className={`${manrope.variable} ${inter.variable} h-full antialiased`}
     >
       <head>
         <script
