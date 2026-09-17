@@ -6,6 +6,7 @@ export type Profile = {
   water_goal_ml: number;
   age_band: "20s-30s" | "30s-50s" | "60-plus" | null;
   onboarded: boolean;
+  terms_accepted_at: string | null;
   created_at: string;
   updated_at: string;
 };

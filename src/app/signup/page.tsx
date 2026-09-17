@@ -41,6 +41,26 @@ export default function SignupPage() {
           />
         </div>
 
+        <label className="flex items-start gap-2.5 text-sm text-ink-soft">
+          <input
+            type="checkbox"
+            name="terms_accepted"
+            required
+            className="mt-0.5 h-4 w-4 flex-shrink-0 rounded border-border accent-terracotta"
+          />
+          <span>
+            I&apos;ve read and agree to the{" "}
+            <Link href="/terms" target="_blank" className="font-semibold text-terracotta-deep">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" target="_blank" className="font-semibold text-terracotta-deep">
+              Privacy Policy
+            </Link>
+            .
+          </span>
+        </label>
+
         {state?.error && (
           <p className="text-sm text-terracotta-deep">{state.error}</p>
         )}

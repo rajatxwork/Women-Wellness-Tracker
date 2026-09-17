@@ -8,6 +8,8 @@ const ALLOWED_SIGNED_OUT = [
   "/forgot-password",
   "/reset-password",
   "/auth",
+  "/terms",
+  "/privacy",
 ];
 
 // Of those, the ones that make no sense for an already-signed-in user, so we
