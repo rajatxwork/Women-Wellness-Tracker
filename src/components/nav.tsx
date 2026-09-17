@@ -93,7 +93,7 @@ export function Sidebar({ userName }: { userName: string }) {
         <div className="flex items-center gap-2">
           <Link
             href="/settings"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:text-terracotta-deep"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:text-terracotta-deep"
             aria-label="Account and privacy settings"
           >
             <Settings size={18} />
@@ -101,7 +101,7 @@ export function Sidebar({ userName }: { userName: string }) {
           <form action={logout}>
             <button
               type="submit"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:text-terracotta-deep"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:text-terracotta-deep"
               aria-label="Sign out"
             >
               <LogOut size={18} />
@@ -125,7 +125,7 @@ export function MobileHeader({ userName }: { userName: string }) {
         <ThemeToggle />
         <Link
           href="/settings"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-ink-soft"
           aria-label="Account and privacy settings"
         >
           <Settings size={16} />
@@ -133,7 +133,7 @@ export function MobileHeader({ userName }: { userName: string }) {
         <form action={logout}>
           <button
             type="submit"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-ink-soft"
             aria-label="Sign out"
           >
             <LogOut size={16} />

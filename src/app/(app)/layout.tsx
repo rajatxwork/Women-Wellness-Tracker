@@ -21,7 +21,7 @@ export default async function AppLayout({
       <div className="flex min-h-screen flex-1 flex-col">
         <MobileHeader userName={userName} />
         <main className="flex-1 pb-24 md:pb-10">
-          <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 md:px-8 md:py-10">
+          <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 md:px-8 md:py-10">
             {children}
           </div>
         </main>
