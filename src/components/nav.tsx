@@ -1,0 +1,128 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  Home,
+  Moon as CycleIcon,
+  Apple,
+  Dumbbell,
+  ListChecks,
+  LineChart,
+  LogOut,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { logout } from "@/app/auth/actions";
+
+const NAV_ITEMS = [
+  { href: "/", label: "Home", icon: Home },
+  { href: "/cycle", label: "Cycle", icon: CycleIcon },
+  { href: "/nutrition", label: "Nutrition", icon: Apple },
+  { href: "/workout", label: "Workout", icon: Dumbbell },
+  { href: "/habits", label: "Habits", icon: ListChecks },
+  { href: "/progress", label: "Progress", icon: LineChart },
+];
+
+export function BottomNav() {
+  const pathname = usePathname();
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/80 md:hidden">
+      <ul className="flex items-stretch justify-between px-1 pb-[env(safe-area-inset-bottom)]">
+        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+          const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+          return (
+            <li key={href} className="flex-1">
+              <Link
+                href={href}
+                className={cn(
+                  "flex flex-col items-center gap-0.5 px-1 py-2.5 text-[11px] font-medium transition-colors",
+                  active ? "text-terracotta-deep" : "text-ink-faint",
+                )}
+              >
+                <Icon size={20} strokeWidth={active ? 2.4 : 1.8} />
+                {label}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
+
+export function Sidebar({ userName }: { userName: string }) {
+  const pathname = usePathname();
+
+  return (
+    <aside className="hidden md:flex md:w-64 md:flex-col md:border-r md:border-border md:bg-surface md:py-8 md:px-4">
+      <div className="mb-8 px-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xl">🌿</span>
+          <span className="font-serif-display text-xl text-ink">Bloom</span>
+        </div>
+        <p className="mt-1 truncate px-0 text-sm text-ink-soft">Hi, {userName}</p>
+      </div>
+
+      <ul className="flex-1 space-y-1">
+        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+          const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+          return (
+            <li key={href}>
+              <Link
+                href={href}
+                className={cn(
+                  "flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium transition-colors",
+                  active
+                    ? "bg-blush/60 text-ink"
+                    : "text-ink-soft hover:bg-cream-soft",
+                )}
+              >
+                <Icon size={18} strokeWidth={active ? 2.4 : 1.8} />
+                {label}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+
+      <div className="mt-4 flex items-center justify-between px-1">
+        <ThemeToggle />
+        <form action={logout}>
+          <button
+            type="submit"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft transition-colors hover:text-terracotta-deep"
+            aria-label="Sign out"
+          >
+            <LogOut size={18} />
+          </button>
+        </form>
+      </div>
+    </aside>
+  );
+}
+
+export function MobileHeader({ userName }: { userName: string }) {
+  return (
+    <header className="flex items-center justify-between border-b border-border bg-surface px-4 py-3 md:hidden">
+      <div className="flex items-center gap-2">
+        <span className="text-lg">🌿</span>
+        <span className="font-serif-display text-lg text-ink">Bloom</span>
+        <span className="text-xs text-ink-faint">· {userName}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
+        <form action={logout}>
+          <button
+            type="submit"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-ink-soft"
+            aria-label="Sign out"
+          >
+            <LogOut size={16} />
+          </button>
+        </form>
+      </div>
+    </header>
+  );
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Bloom — Your Wellness Journal",
+  "short_name": "Bloom",
+  "description": "A warm, everyday companion for tracking your cycle, nutrition, movement, and habits.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fbf6f0",
+  "theme_color": "#c97b5e",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

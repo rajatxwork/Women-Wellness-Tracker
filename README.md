@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bloom — Women's Wellness Tracker
 
-## Getting Started
+A warm, editorial companion app for the wellness e-book: cycle tracking, goal-based
+nutrition, a 3-day strength program, habits, tasks, and reflective analytics.
+Built with Next.js (App Router), TypeScript, Tailwind CSS, and Supabase.
 
-First, run the development server:
+## Getting started
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. **Create a Supabase project** at [supabase.com](https://supabase.com).
+2. **Run the schema.** Open the SQL editor in your Supabase project and run the
+   contents of [`schema.sql`](./schema.sql). This creates every table, enables
+   Row Level Security scoped to `auth.uid()`, and seeds the nutrition goal
+   categories and movement pattern/exercise reference data extracted from the
+   e-book.
+3. **Configure environment variables.** Copy `.env.local.example` to `.env.local`
+   and fill in your project's URL and anon key (Project Settings → API):
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   ```bash
+   cp .env.local.example .env.local
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+4. **Install dependencies and run the dev server:**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   npm install
+   npm run dev
+   ```
 
-## Learn More
+   Visit [http://localhost:3000](http://localhost:3000) — you'll land on the
+   sign-up page.
 
-To learn more about Next.js, take a look at the following resources:
+5. **Email confirmation.** By default Supabase requires email confirmation for
+   new sign-ups. Either confirm via the email Supabase sends, or turn off
+   "Confirm email" under Authentication → Providers → Email in your Supabase
+   dashboard for faster local testing.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `src/app/(app)/` — the authenticated app shell (dashboard, cycle, nutrition,
+  workout, habits, progress), protected by `src/proxy.ts` (Next's middleware
+  convention) and the layout's session check.
+- `src/app/login`, `src/app/signup`, `src/app/onboarding` — auth flow.
+- `src/app/actions/` — server actions for all mutations (water, habits, tasks,
+  cycle, nutrition, workout logging).
+- `src/lib/data/` — reference content extracted from the companion e-book:
+  nutrition goal categories & foods, movement patterns & exercises, bodyweight
+  progression levels, plyometric sets by age band, cardio guidance, and
+  cycle-phase tips.
+- `src/lib/encouragement.ts` — the app's voice: rotating, categorized copy for
+  celebrations, gentle nudges, streaks, phase tips, and empty states.
+- `schema.sql` — full Postgres schema with RLS policies and seed data, ready to
+  run in the Supabase SQL editor.
 
-## Deploy on Vercel
+## Design system
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Warm, editorial palette (blush, terracotta, sage, cream) defined as CSS custom
+properties in `src/app/globals.css`, with a cozy warm-charcoal dark mode
+(toggle in the sidebar/header, persisted to `localStorage`). Headings use
+Fraunces (serif), body text uses Nunito.
