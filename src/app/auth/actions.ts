@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getSiteURL } from "@/lib/utils";
 
 export type AuthState = { error?: string } | null;
 
@@ -48,7 +49,7 @@ export async function signup(
   if (data.user && !data.session) {
     return {
       error:
-        "Almost there — check your inbox for a confirmation link to finish setting up your account.",
+        "Almost there, check your inbox for a confirmation link to finish setting up your account.",
     };
   }
 
@@ -97,6 +98,61 @@ export async function completeOnboarding(
       user_id: user.id,
       period_start: lastPeriodStart,
     });
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/");
+}
+
+export async function requestPasswordReset(
+  _prevState: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const supabase = await createClient();
+  const email = String(formData.get("email") ?? "");
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${getSiteURL()}/auth/confirm?type=recovery&next=/reset-password`,
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return {
+    error:
+      "If an account exists for that email, a reset link is on its way. It can take a minute or two to land.",
+  };
+}
+
+export async function updatePassword(
+  _prevState: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "That reset link has expired. Request a new one and try again." };
+  }
+
+  const password = String(formData.get("password") ?? "");
+  const confirmPassword = String(formData.get("confirm_password") ?? "");
+
+  if (password.length < 6) {
+    return { error: "Password needs to be at least 6 characters." };
+  }
+
+  if (password !== confirmPassword) {
+    return { error: "Those two passwords don't match." };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    return { error: error.message };
   }
 
   revalidatePath("/", "layout");

@@ -11,7 +11,7 @@ export const CARDIO_TYPES: {
     type: "zone2",
     name: "Steady & Easy (Zone 2)",
     description:
-      "Movement at a pace where you can comfortably talk, like brisk walking or easy cycling. This is your longevity workhorse — it builds your body's energy producing capacity and burns fat efficiently without spiking stress hormones.",
+      "Movement at a pace where you can comfortably talk, like brisk walking or easy cycling. This is your longevity workhorse, it builds your body's energy producing capacity and burns fat efficiently without spiking stress hormones.",
     examples: [
       "Brisk walking",
       "Easy cycling",
@@ -40,7 +40,7 @@ export const CARDIO_WEEKLY_TARGETS = {
   moderateMinutesHigh: 300,
   vigorousMinutesLow: 75,
   vigorousMinutesHigh: 150,
-  note: "Research indicates women get equal or even greater benefit from shorter durations of cardio compared to men — around 140 minutes of moderate movement a week has been shown to reduce all-cause mortality risk by about 18 percent.",
+  note: "Research indicates women get equal or even greater benefit from shorter durations of cardio compared to men, around 140 minutes of moderate movement a week has been shown to reduce all-cause mortality risk by about 18 percent.",
 };
 
 export const CARDIO_NO_EQUIPMENT_OPTIONS = [
@@ -60,11 +60,11 @@ export const CARDIO_EQUIPMENT_OPTIONS = [
 ];
 
 export const CARDIO_FRICTION_TIPS = [
-  "Take your calls on the move — pace around your home or walk outside during phone calls, podcasts, or audiobooks.",
-  "Snack on movement — one or two minutes of brisk stair climbing or jumping jacks between tasks adds up more than you'd expect.",
-  "Upgrade your commute — park further away, take the stairs, or walk briskly for ten minutes before and after work.",
+  "Take your calls on the move, pace around your home or walk outside during phone calls, podcasts, or audiobooks.",
+  "Snack on movement, one or two minutes of brisk stair climbing or jumping jacks between tasks adds up more than you'd expect.",
+  "Upgrade your commute, park further away, take the stairs, or walk briskly for ten minutes before and after work.",
   "Turn coffee dates into walking dates.",
-  "Walk after you eat — a ten minute walk after lunch and dinner adds up to about twenty minutes of easy cardio a day.",
+  "Walk after you eat, a ten minute walk after lunch and dinner adds up to about twenty minutes of easy cardio a day.",
 ];
 
 export const CARDIO_GOAL_TIPS: { goalSlug: string; tips: string[] }[] = [
@@ -78,7 +78,7 @@ export const CARDIO_GOAL_TIPS: { goalSlug: string; tips: string[] }[] = [
   {
     goalSlug: "focus-brain",
     tips: [
-      "Aerobic movement, done regularly, stimulates BDNF — nicknamed 'fertilizer for the brain' — helping grow new brain cells involved in memory.",
+      "Aerobic movement, done regularly, stimulates BDNF, nicknamed 'fertilizer for the brain', helping grow new brain cells involved in memory.",
       "Short, intense bursts of effort are especially good at boosting focus and mental clarity, often within the same day.",
     ],
   },
@@ -92,7 +92,7 @@ export const CARDIO_GOAL_TIPS: { goalSlug: string; tips: string[] }[] = [
   {
     goalSlug: "sleep",
     tips: [
-      "Moderate cardio earlier in the day raises your core temperature temporarily — the natural drop a few hours later signals your brain to wind down.",
+      "Moderate cardio earlier in the day raises your core temperature temporarily, the natural drop a few hours later signals your brain to wind down.",
       "Try to finish your workout at least three hours before bed.",
     ],
   },
@@ -106,7 +106,7 @@ export const CARDIO_GOAL_TIPS: { goalSlug: string; tips: string[] }[] = [
   {
     goalSlug: "skin-hair-nails",
     tips: [
-      "Cardio opens tiny blood vessels near your skin's surface, delivering oxygen, zinc, and vitamin C directly to skin cells — that's the post-workout glow.",
+      "Cardio opens tiny blood vessels near your skin's surface, delivering oxygen, zinc, and vitamin C directly to skin cells, that's the post-workout glow.",
       "Increased blood flow to your scalp delivers iron, oxygen, and biotin straight to your hair follicles.",
     ],
   },

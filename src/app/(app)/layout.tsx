@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthedUser, getProfile } from "@/lib/supabase/get-user";
 import { BottomNav, Sidebar, MobileHeader } from "@/components/nav";
 
 export default async function AppLayout({
@@ -7,19 +7,10 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const user = await getAuthedUser();
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
-
+  const profile = await getProfile(user.id);
   if (!profile?.onboarded) redirect("/onboarding");
 
   const userName = profile?.name || "there";

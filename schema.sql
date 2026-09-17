@@ -1,4 +1,4 @@
--- Selene — Women's Wellness Tracker
+-- Selene: Women's Wellness Tracker
 -- Complete database schema for Supabase (Postgres + Row Level Security).
 -- Run this in the Supabase SQL editor on a fresh project.
 -- All user-data tables are scoped to auth.uid() via RLS policies.
@@ -162,6 +162,70 @@ create policy "water_logs are owner-scoped insert" on public.water_logs
 create policy "water_logs are owner-scoped delete" on public.water_logs
   for delete using (auth.uid() = user_id);
 
+-- A personal macro/micro nutrient target sheet the user builds herself, or
+-- prefills from the built-in calculator (client-side, science-based DRI/
+-- Mifflin-St Jeor math, no external API).
+create table if not exists public.nutrient_targets (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  nutrient_name text not null,
+  category text not null check (category in ('macro', 'micro')),
+  target_amount numeric not null,
+  unit text not null,
+  created_at timestamptz not null default now(),
+  unique (user_id, nutrient_name)
+);
+
+alter table public.nutrient_targets enable row level security;
+
+create policy "nutrient_targets are owner-scoped select" on public.nutrient_targets
+  for select using (auth.uid() = user_id);
+create policy "nutrient_targets are owner-scoped insert" on public.nutrient_targets
+  for insert with check (auth.uid() = user_id);
+create policy "nutrient_targets are owner-scoped update" on public.nutrient_targets
+  for update using (auth.uid() = user_id);
+create policy "nutrient_targets are owner-scoped delete" on public.nutrient_targets
+  for delete using (auth.uid() = user_id);
+
+create table if not exists public.supplements (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  name text not null,
+  dosage text,
+  notes text,
+  created_at timestamptz not null default now()
+);
+
+alter table public.supplements enable row level security;
+
+create policy "supplements are owner-scoped select" on public.supplements
+  for select using (auth.uid() = user_id);
+create policy "supplements are owner-scoped insert" on public.supplements
+  for insert with check (auth.uid() = user_id);
+create policy "supplements are owner-scoped delete" on public.supplements
+  for delete using (auth.uid() = user_id);
+
+create table if not exists public.supplement_logs (
+  id uuid primary key default gen_random_uuid(),
+  supplement_id uuid not null references public.supplements (id) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  log_date date not null,
+  taken boolean not null default true,
+  created_at timestamptz not null default now(),
+  unique (supplement_id, log_date)
+);
+
+alter table public.supplement_logs enable row level security;
+
+create policy "supplement_logs are owner-scoped select" on public.supplement_logs
+  for select using (auth.uid() = user_id);
+create policy "supplement_logs are owner-scoped insert" on public.supplement_logs
+  for insert with check (auth.uid() = user_id);
+create policy "supplement_logs are owner-scoped update" on public.supplement_logs
+  for update using (auth.uid() = user_id);
+create policy "supplement_logs are owner-scoped delete" on public.supplement_logs
+  for delete using (auth.uid() = user_id);
+
 -- ============================================================================
 -- WORKOUTS
 -- ============================================================================
@@ -192,6 +256,92 @@ create policy "exercises are readable by anyone authenticated"
   on public.exercises for select
   using (auth.role() = 'authenticated');
 
+-- User-defined bundles: a free-form alternative to the book's 8 movement
+-- patterns, for exercises that don't fit neatly into any of them.
+create table if not exists public.exercise_bundles (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  name text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table public.exercise_bundles enable row level security;
+
+create policy "exercise_bundles are owner-scoped select" on public.exercise_bundles
+  for select using (auth.uid() = user_id);
+create policy "exercise_bundles are owner-scoped insert" on public.exercise_bundles
+  for insert with check (auth.uid() = user_id);
+create policy "exercise_bundles are owner-scoped update" on public.exercise_bundles
+  for update using (auth.uid() = user_id);
+create policy "exercise_bundles are owner-scoped delete" on public.exercise_bundles
+  for delete using (auth.uid() = user_id);
+
+-- Custom exercises a user adds herself, attached to either one of the
+-- book's built-in movement patterns or one of her own bundles above.
+create table if not exists public.custom_exercises (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  name text not null,
+  pattern_slug text references public.movement_patterns (slug),
+  bundle_id uuid references public.exercise_bundles (id) on delete cascade,
+  variant text check (variant in ('gym', 'home-weights', 'bodyweight')),
+  created_at timestamptz not null default now(),
+  constraint custom_exercise_has_one_home check (
+    (pattern_slug is not null and bundle_id is null)
+    or (pattern_slug is null and bundle_id is not null)
+  )
+);
+
+alter table public.custom_exercises enable row level security;
+
+create policy "custom_exercises are owner-scoped select" on public.custom_exercises
+  for select using (auth.uid() = user_id);
+create policy "custom_exercises are owner-scoped insert" on public.custom_exercises
+  for insert with check (auth.uid() = user_id);
+create policy "custom_exercises are owner-scoped delete" on public.custom_exercises
+  for delete using (auth.uid() = user_id);
+
+-- Programs: a named training plan a user builds from her own chosen
+-- movements (built-in or custom), logged and tracked over time.
+create table if not exists public.programs (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  name text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table public.programs enable row level security;
+
+create policy "programs are owner-scoped select" on public.programs
+  for select using (auth.uid() = user_id);
+create policy "programs are owner-scoped insert" on public.programs
+  for insert with check (auth.uid() = user_id);
+create policy "programs are owner-scoped update" on public.programs
+  for update using (auth.uid() = user_id);
+create policy "programs are owner-scoped delete" on public.programs
+  for delete using (auth.uid() = user_id);
+
+create table if not exists public.program_items (
+  id uuid primary key default gen_random_uuid(),
+  program_id uuid not null references public.programs (id) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  pattern_slug text references public.movement_patterns (slug),
+  bundle_id uuid references public.exercise_bundles (id) on delete set null,
+  exercise_name text not null,
+  variant text check (variant in ('gym', 'home-weights', 'bodyweight')),
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+
+alter table public.program_items enable row level security;
+
+create policy "program_items are owner-scoped select" on public.program_items
+  for select using (auth.uid() = user_id);
+create policy "program_items are owner-scoped insert" on public.program_items
+  for insert with check (auth.uid() = user_id);
+create policy "program_items are owner-scoped delete" on public.program_items
+  for delete using (auth.uid() = user_id);
+
 create table if not exists public.workout_sessions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
@@ -199,6 +349,7 @@ create table if not exists public.workout_sessions (
   session_type text not null default 'strength'
     check (session_type in ('strength', 'cardio', 'plyo', 'recovery', 'rest')),
   patterns_trained text[] default '{}',
+  program_id uuid references public.programs (id) on delete set null,
   notes text,
   created_at timestamptz not null default now()
 );
@@ -218,7 +369,8 @@ create table if not exists public.workout_sets (
   id uuid primary key default gen_random_uuid(),
   session_id uuid not null references public.workout_sessions (id) on delete cascade,
   user_id uuid not null references auth.users (id) on delete cascade,
-  pattern_slug text not null references public.movement_patterns (slug),
+  pattern_slug text references public.movement_patterns (slug),
+  bundle_id uuid references public.exercise_bundles (id) on delete set null,
   exercise_name text not null,
   variant text check (variant in ('gym', 'home-weights', 'bodyweight')),
   set_number int not null default 1,
@@ -374,7 +526,7 @@ create policy "tasks are owner-scoped delete" on public.tasks
   for delete using (auth.uid() = user_id);
 
 -- ============================================================================
--- SEED DATA — reference content extracted from the companion e-book
+-- SEED DATA, reference content extracted from the companion e-book
 -- ============================================================================
 
 insert into public.movement_patterns (slug, name, priority, sort_order) values
@@ -466,7 +618,7 @@ on conflict do nothing;
 
 insert into public.nutrition_goal_categories (slug, name, tagline, quick_tip, foods, sort_order) values
 ('focus-brain', 'Focus & Brain',
- 'Your ability to concentrate is not just about willpower — it depends on specific nutrients your brain needs to make its own focus chemicals.',
+ 'Your ability to concentrate is not just about willpower, it depends on specific nutrients your brain needs to make its own focus chemicals.',
  null,
  '[
    {"food":"Eggs, especially the yolk","why":"They contain choline, which your brain directly turns into the chemical responsible for memory and staying on task."},
@@ -478,8 +630,8 @@ insert into public.nutrition_goal_categories (slug, name, tagline, quick_tip, fo
    {"food":"Citrus fruits and bell peppers","why":"Vitamin C helps your body properly use the iron from plant foods and helps convert your focus chemicals into their active form."}
  ]'::jsonb, 1),
 ('energy', 'Energy',
- 'Feeling tired all the time is usually not about needing more coffee — it''s usually about your body missing the raw materials it needs to make energy at a cellular level.',
- 'If you crash hard in the afternoon, look at what you had earlier — a meal of only fast-digesting carbs with nothing else tends to be the culprit.',
+ 'Feeling tired all the time is usually not about needing more coffee, it''s usually about your body missing the raw materials it needs to make energy at a cellular level.',
+ 'If you crash hard in the afternoon, look at what you had earlier, a meal of only fast-digesting carbs with nothing else tends to be the culprit.',
  '[
    {"food":"Red meat, lentils, and spinach","why":"Iron carries oxygen through your blood to fuel every cell in your body."},
    {"food":"Whole grains, pork, and legumes","why":"These contain B1, one of the very first steps your body takes to turn food into usable energy."},
@@ -501,7 +653,7 @@ insert into public.nutrition_goal_categories (slug, name, tagline, quick_tip, fo
    {"food":"Citrus fruits and strawberries","why":"Vitamin C is essential for your body to actually build collagen in your tendons and ligaments."}
  ]'::jsonb, 3),
 ('muscle-recovery', 'Muscle & Recovery',
- 'Muscle isn''t just about how you look — it protects your metabolism, your joints, and your independence as you get older.',
+ 'Muscle isn''t just about how you look, it protects your metabolism, your joints, and your independence as you get older.',
  null,
  '[
    {"food":"Chicken breast, Greek yogurt, eggs, and lentils","why":"These are rich in leucine, a specific amino acid that directly tells your body to build muscle."},
@@ -510,7 +662,7 @@ insert into public.nutrition_goal_categories (slug, name, tagline, quick_tip, fo
    {"food":"Fortified dairy and egg yolks","why":"Vitamin D and calcium work together to help your muscles contract properly and recover well."}
  ]'::jsonb, 4),
 ('skin-hair-nails', 'Skin, Hair & Nails',
- 'Your skin, hair, and nails are made from the same nutrients as everything else in your body — they just show a deficiency faster and more visibly.',
+ 'Your skin, hair, and nails are made from the same nutrients as everything else in your body, they just show a deficiency faster and more visibly.',
  null,
  '[
    {"food":"Bone broth and collagen-rich foods","why":"These directly supply the building blocks for skin elasticity."},
@@ -520,7 +672,7 @@ insert into public.nutrition_goal_categories (slug, name, tagline, quick_tip, fo
    {"food":"Almonds, sunflower seeds, and avocado","why":"Vitamin E protects your skin cells and supports healthy, even skin turnover."}
  ]'::jsonb, 5),
 ('sleep', 'Sleep',
- 'Good sleep isn''t only about your bedtime routine — it''s genuinely influenced by what you eat.',
+ 'Good sleep isn''t only about your bedtime routine, it''s genuinely influenced by what you eat.',
  null,
  '[
    {"food":"Turkey, eggs, and seeds","why":"These contain tryptophan, which your body converts into serotonin and then into melatonin, your sleep hormone."},
@@ -533,13 +685,13 @@ insert into public.nutrition_goal_categories (slug, name, tagline, quick_tip, fo
  null,
  '[
    {"food":"Healthy carbs, first half of your cycle","why":"Your body handles carbohydrates especially efficiently here, so this is a great time to fuel workouts and active days."},
-   {"food":"A bit more food, second half of your cycle","why":"Your metabolism actually rises slightly and cravings increase — this is biology, not a lack of willpower."},
+   {"food":"A bit more food, second half of your cycle","why":"Your metabolism actually rises slightly and cravings increase, this is biology, not a lack of willpower."},
    {"food":"Onions, cooked and cooled potatoes, and apples","why":"These feed the healthy gut bacteria that help regulate your circulating hormone levels."},
    {"food":"Salmon, walnuts, and flaxseed","why":"Omega-3s support healthy hormone production overall."},
-   {"food":"Avocado, olive oil, and nuts","why":"Your hormones are literally made from fat — don''t go too low on healthy fats if you want a stable, regular cycle."}
+   {"food":"Avocado, olive oil, and nuts","why":"Your hormones are literally made from fat, don''t go too low on healthy fats if you want a stable, regular cycle."}
  ]'::jsonb, 7),
 ('immune', 'Immune System',
- 'Your immune system isn''t something you only think about when you''re already sick — you can genuinely support it every single day through food.',
+ 'Your immune system isn''t something you only think about when you''re already sick, you can genuinely support it every single day through food.',
  null,
  '[
    {"food":"Oysters, beef, and pumpkin seeds","why":"Zinc is one of the most important minerals for immune defense and wound healing."},
@@ -549,7 +701,7 @@ insert into public.nutrition_goal_categories (slug, name, tagline, quick_tip, fo
    {"food":"Garlic, onions, and cruciferous vegetables","why":"These contain sulfur compounds that support your body''s natural detoxification and immune processes."}
  ]'::jsonb, 8),
 ('mood', 'Mood',
- 'Mood isn''t purely psychological — a good portion of it is genuinely chemical, and that chemistry runs on food.',
+ 'Mood isn''t purely psychological, a good portion of it is genuinely chemical, and that chemistry runs on food.',
  null,
  '[
    {"food":"Turkey, eggs, and seeds","why":"Tryptophan is the direct building block for serotonin, your body''s natural mood-stabilizing chemical."},
@@ -559,7 +711,7 @@ insert into public.nutrition_goal_categories (slug, name, tagline, quick_tip, fo
    {"food":"Dark leafy greens, lentils, and beans","why":"Folate plays a role in producing mood-related brain chemicals."}
  ]'::jsonb, 9),
 ('digestion-gut', 'Digestion & Gut Health',
- 'A happy gut affects way more than just digestion — it actually influences your hormones, your mood, and your immune system too.',
+ 'A happy gut affects way more than just digestion, it actually influences your hormones, your mood, and your immune system too.',
  null,
  '[
    {"food":"Onions, cooked and cooled potatoes, and apples","why":"These feed your beneficial gut bacteria with fermentable fiber."},
@@ -569,7 +721,7 @@ insert into public.nutrition_goal_categories (slug, name, tagline, quick_tip, fo
    {"food":"Water, consistently through the day","why":"Fiber needs water to actually work properly in your digestive system."}
  ]'::jsonb, 10),
 ('heart', 'Heart Health',
- 'Heart health isn''t just a concern for later in life — the habits that protect it are worth building now.',
+ 'Heart health isn''t just a concern for later in life, the habits that protect it are worth building now.',
  null,
  '[
    {"food":"Olive oil, avocado, and almonds","why":"Unsaturated fats support healthy blood flow and are linked to better heart health outcomes."},
@@ -579,7 +731,7 @@ insert into public.nutrition_goal_categories (slug, name, tagline, quick_tip, fo
    {"food":"Berries, dark chocolate, and green tea","why":"These contain plant compounds that support healthy blood vessels and lower oxidative stress."}
  ]'::jsonb, 11),
 ('metabolism', 'Metabolism',
- 'Your metabolism isn''t simply fast or slow forever — it''s genuinely influenced by what and how you eat.',
+ 'Your metabolism isn''t simply fast or slow forever, it''s genuinely influenced by what and how you eat.',
  null,
  '[
    {"food":"Iodized salt, seaweed, and dairy","why":"Iodine is required to produce your thyroid hormones, and your thyroid largely sets your metabolic rate."},
@@ -589,7 +741,7 @@ insert into public.nutrition_goal_categories (slug, name, tagline, quick_tip, fo
    {"food":"Regular meals rather than long gaps or skipping","why":"Consistently under-eating can actually slow your metabolism down over time."}
  ]'::jsonb, 12),
 ('period-cramps', 'Period & Cramps',
- 'Period pain is common, but that doesn''t mean it has to be your normal — nutrition genuinely plays a role here.',
+ 'Period pain is common, but that doesn''t mean it has to be your normal, nutrition genuinely plays a role here.',
  null,
  '[
    {"food":"Pumpkin seeds, dark chocolate, and spinach","why":"Magnesium helps relax the uterine muscle itself, directly reducing cramp intensity for a lot of women."},

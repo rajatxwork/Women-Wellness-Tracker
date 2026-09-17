@@ -42,7 +42,7 @@ export const PLYOMETRIC_SETS: PlyoSet[] = [
       },
       {
         name: "Standing pillow or light medicine ball slams",
-        detail: "Lifting overhead and throwing down explosively — genuinely great for releasing stress.",
+        detail: "Lifting overhead and throwing down explosively, genuinely great for releasing stress.",
       },
       {
         name: "In and out squat jacks",
@@ -72,4 +72,4 @@ export const PLYOMETRIC_SETS: PlyoSet[] = [
 ];
 
 export const PLYO_QUICK_TIP =
-  "Always aim for a soft, quiet landing — that means your muscles and tendons are absorbing the impact properly, not your joints. Two to three sets of five to ten reps, twice a week, is genuinely enough.";
+  "Always aim for a soft, quiet landing, that means your muscles and tendons are absorbing the impact properly, not your joints. Two to three sets of five to ten reps, twice a week, is genuinely enough.";

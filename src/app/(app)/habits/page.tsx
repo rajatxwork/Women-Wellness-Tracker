@@ -1,16 +1,18 @@
+import { ListChecks } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthedUser } from "@/lib/supabase/get-user";
 import { todayISO } from "@/lib/utils";
 import { computeStreak } from "@/lib/streaks";
 import { Card } from "@/components/ui/card";
+import { PageHeading } from "@/components/page-heading";
 import { HabitManager } from "@/components/habit-manager";
 import { TaskManager } from "@/components/task-manager";
 
 export default async function HabitsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthedUser();
   if (!user) return null;
+
+  const supabase = await createClient();
 
   const today = todayISO();
 
@@ -54,10 +56,12 @@ export default async function HabitsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-serif-display text-3xl text-ink">Habits & Tasks</h1>
-        <p className="mt-1 text-ink-soft">Small, repeatable things — and the odd one-off to remember.</p>
-      </div>
+      <PageHeading
+        icon={ListChecks}
+        title="Habits & Tasks"
+        subtitle="Small, repeatable things, and the odd one-off to remember."
+        accentClass="bg-plum/15 text-plum"
+      />
 
       <Card>
         <h2 className="mb-4 font-serif-display text-lg text-ink">Daily habits</h2>

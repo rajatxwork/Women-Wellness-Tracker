@@ -17,7 +17,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
     slug: "focus-brain",
     name: "Focus & Brain",
     tagline:
-      "Your ability to concentrate is not just about willpower — it depends on specific nutrients your brain needs to make its own focus chemicals.",
+      "Your ability to concentrate is not just about willpower, it depends on specific nutrients your brain needs to make its own focus chemicals.",
     foods: [
       {
         food: "Eggs, especially the yolk",
@@ -53,7 +53,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
     slug: "energy",
     name: "Energy",
     tagline:
-      "Feeling tired all the time is usually not about needing more coffee — it's usually about your body missing the raw materials it needs to make energy at a cellular level.",
+      "Feeling tired all the time is usually not about needing more coffee, it's usually about your body missing the raw materials it needs to make energy at a cellular level.",
     foods: [
       {
         food: "Red meat, lentils, and spinach",
@@ -81,7 +81,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
       },
     ],
     quickTip:
-      "If you crash hard in the afternoon, look at what you had earlier — a meal of only fast-digesting carbs with nothing else tends to be the culprit.",
+      "If you crash hard in the afternoon, look at what you had earlier, a meal of only fast-digesting carbs with nothing else tends to be the culprit.",
   },
   {
     slug: "bone-joint",
@@ -95,7 +95,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
       },
       {
         food: "Fatty fish, egg yolks, and safe sun exposure",
-        why: "Vitamin D is what allows your body to actually absorb that calcium — without it, calcium mostly goes to waste.",
+        why: "Vitamin D is what allows your body to actually absorb that calcium, without it, calcium mostly goes to waste.",
       },
       {
         food: "Fermented foods like natto, and leafy greens",
@@ -123,7 +123,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
     slug: "muscle-recovery",
     name: "Muscle & Recovery",
     tagline:
-      "Muscle isn't just about how you look — it protects your metabolism, your joints, and your independence as you get older.",
+      "Muscle isn't just about how you look, it protects your metabolism, your joints, and your independence as you get older.",
     foods: [
       {
         food: "Chicken breast, Greek yogurt, eggs, and lentils",
@@ -147,7 +147,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
     slug: "skin-hair-nails",
     name: "Skin, Hair & Nails",
     tagline:
-      "Your skin, hair, and nails are made from the same nutrients as everything else in your body — they just show a deficiency faster and more visibly.",
+      "Your skin, hair, and nails are made from the same nutrients as everything else in your body, they just show a deficiency faster and more visibly.",
     foods: [
       {
         food: "Bone broth and collagen-rich foods",
@@ -175,7 +175,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
     slug: "sleep",
     name: "Sleep",
     tagline:
-      "Good sleep isn't only about your bedtime routine — it's genuinely influenced by what you eat.",
+      "Good sleep isn't only about your bedtime routine, it's genuinely influenced by what you eat.",
     foods: [
       {
         food: "Turkey, eggs, and seeds",
@@ -207,7 +207,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
       },
       {
         food: "A bit more food, second half of your cycle",
-        why: "Your metabolism actually rises slightly and cravings increase — this is biology, not a lack of willpower. Support it with magnesium and B vitamins.",
+        why: "Your metabolism actually rises slightly and cravings increase, this is biology, not a lack of willpower. Support it with magnesium and B vitamins.",
       },
       {
         food: "Onions, cooked and cooled potatoes, and apples",
@@ -219,7 +219,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
       },
       {
         food: "Avocado, olive oil, and nuts",
-        why: "Your hormones are literally made from fat — don't go too low on healthy fats if you want a stable, regular cycle.",
+        why: "Your hormones are literally made from fat, don't go too low on healthy fats if you want a stable, regular cycle.",
       },
     ],
   },
@@ -227,7 +227,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
     slug: "immune",
     name: "Immune System",
     tagline:
-      "Your immune system isn't something you only think about when you're already sick — you can genuinely support it every single day through food.",
+      "Your immune system isn't something you only think about when you're already sick, you can genuinely support it every single day through food.",
     foods: [
       {
         food: "Oysters, beef, and pumpkin seeds",
@@ -255,7 +255,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
     slug: "mood",
     name: "Mood",
     tagline:
-      "Mood isn't purely psychological — a good portion of it is genuinely chemical, and that chemistry runs on food.",
+      "Mood isn't purely psychological, a good portion of it is genuinely chemical, and that chemistry runs on food.",
     foods: [
       {
         food: "Turkey, eggs, and seeds",
@@ -283,7 +283,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
     slug: "digestion-gut",
     name: "Digestion & Gut Health",
     tagline:
-      "A happy gut affects way more than just digestion — it actually influences your hormones, your mood, and your immune system too.",
+      "A happy gut affects way more than just digestion, it actually influences your hormones, your mood, and your immune system too.",
     foods: [
       {
         food: "Onions, cooked and cooled potatoes, and apples",
@@ -303,7 +303,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
       },
       {
         food: "Water, consistently through the day",
-        why: "Fiber needs water to actually work properly — upping your fiber without upping your water can make things worse, not better.",
+        why: "Fiber needs water to actually work properly, upping your fiber without upping your water can make things worse, not better.",
       },
     ],
   },
@@ -311,7 +311,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
     slug: "heart",
     name: "Heart Health",
     tagline:
-      "Heart health isn't just a concern for later in life — the habits that protect it are worth building now.",
+      "Heart health isn't just a concern for later in life, the habits that protect it are worth building now.",
     foods: [
       {
         food: "Olive oil, avocado, and almonds",
@@ -339,7 +339,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
     slug: "metabolism",
     name: "Metabolism",
     tagline:
-      "Your metabolism isn't simply fast or slow forever — it's genuinely influenced by what and how you eat.",
+      "Your metabolism isn't simply fast or slow forever, it's genuinely influenced by what and how you eat.",
     foods: [
       {
         food: "Iodized salt, seaweed, and dairy",
@@ -367,7 +367,7 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
     slug: "period-cramps",
     name: "Period & Cramps",
     tagline:
-      "Period pain is common, but that doesn't mean it has to be your normal — nutrition genuinely plays a role here.",
+      "Period pain is common, but that doesn't mean it has to be your normal, nutrition genuinely plays a role here.",
     foods: [
       {
         food: "Pumpkin seeds, dark chocolate, and spinach",
@@ -422,14 +422,14 @@ export const NUTRITION_GOAL_CATEGORIES: NutritionGoalCategory[] = [
 ];
 
 export const NUTRITION_SIMPLE_TIPS = [
-  "Try to get a protein source into every meal, not just dinner — your body uses protein better when it's spread out across the day.",
+  "Try to get a protein source into every meal, not just dinner, your body uses protein better when it's spread out across the day.",
   "Pair your carbs with something else. A little protein, fat, or fiber alongside your carbs prevents the energy crash of eating carbs alone.",
-  "Do not fear fat — a completely fat-free meal actually blocks your body from absorbing several important vitamins.",
+  "Do not fear fat, a completely fat-free meal actually blocks your body from absorbing several important vitamins.",
   "Pair iron-rich foods with vitamin C. A squeeze of lemon on spinach meaningfully increases how much iron your body absorbs.",
-  "Watch your coffee timing — coffee and tea can block iron and zinc absorption if had during or right after a meal.",
-  "Macronutrients matter just as much as micronutrients — getting enough protein, carbs, and fat overall matters as much as vitamins and minerals.",
-  "Do not skip meals to save calories — long gaps often lead to overeating later.",
-  "Color on your plate is a decent shortcut — different colored fruits and vegetables generally bring different nutrients.",
-  "Frozen counts — frozen fruit and vegetables are usually just as nutritious as fresh.",
-  "Consistency beats perfection — eating well most of the time matters more than eating perfectly some of the time.",
+  "Watch your coffee timing, coffee and tea can block iron and zinc absorption if had during or right after a meal.",
+  "Macronutrients matter just as much as micronutrients, getting enough protein, carbs, and fat overall matters as much as vitamins and minerals.",
+  "Do not skip meals to save calories, long gaps often lead to overeating later.",
+  "Color on your plate is a decent shortcut, different colored fruits and vegetables generally bring different nutrients.",
+  "Frozen counts, frozen fruit and vegetables are usually just as nutritious as fresh.",
+  "Consistency beats perfection, eating well most of the time matters more than eating perfectly some of the time.",
 ];

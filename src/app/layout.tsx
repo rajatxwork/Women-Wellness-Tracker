@@ -3,23 +3,27 @@ import { Fraunces, Nunito } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
+// Only the weights/styles actually used in the app are loaded, since each
+// extra one is a render-blocking font file on first paint.
 const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
+  weight: ["400"],
+  style: ["normal"],
+  display: "swap",
 });
 
 const nunito = Nunito({
   variable: "--font-nunito",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Selene — Your Wellness Journal",
+  title: "Selene: Your Wellness Journal",
   description:
-    "A warm, everyday companion for tracking your cycle, nutrition, movement, and habits — at your own pace.",
+    "A warm, everyday companion for tracking your cycle, nutrition, movement, and habits, at your own pace.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,

@@ -104,7 +104,7 @@ export function PlyoForm({ defaultAgeBand }: { defaultAgeBand: AgeBand }) {
                 : "border-border bg-surface-soft text-ink-soft",
             )}
           >
-            <span className="font-medium text-ink">{ex.name}</span> — {ex.detail}
+            <span className="font-medium text-ink">{ex.name}</span>, {ex.detail}
           </button>
         ))}
       </div>

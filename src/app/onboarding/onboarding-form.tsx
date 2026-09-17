@@ -17,7 +17,7 @@ export function OnboardingForm({ defaultName }: { defaultName: string }) {
 
       <div>
         <Label htmlFor="avg_cycle_length">
-          Roughly how long is your cycle? (Most are 21–35 days — 28 is a fine default.)
+          Roughly how long is your cycle? (Most are 21–35 days, 28 is a fine default.)
         </Label>
         <Input
           id="avg_cycle_length"

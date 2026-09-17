@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthedUser, getProfile } from "@/lib/supabase/get-user";
 import { todayISO } from "@/lib/utils";
 import { computeCycleStatus } from "@/lib/cycle";
 import { CYCLE_PHASES } from "@/lib/data/cycle-phases";
@@ -12,17 +14,15 @@ import { QuickTasks } from "@/components/quick-tasks";
 import { LinkButton } from "@/components/ui/button";
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthedUser();
   if (!user) return null;
 
+  const supabase = await createClient();
   const today = todayISO();
 
-  const [{ data: profile }, { data: waterLogs }, { data: habits }, { data: habitLogsToday }, { data: tasks }] =
+  const [profile, { data: waterLogs }, { data: habits }, { data: habitLogsToday }, { data: tasks }] =
     await Promise.all([
-      supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+      getProfile(user.id),
       supabase.from("water_logs").select("amount_ml").eq("user_id", user.id).eq("log_date", today),
       supabase
         .from("habits")
@@ -66,7 +66,10 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-ink-soft">{getGreeting(seed)}</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-terracotta-deep">
+          {format(new Date(), "EEEE, MMMM d")}
+        </p>
+        <p className="mt-1 text-ink-soft">{getGreeting(seed)}</p>
         <h1 className="font-serif-display text-3xl text-ink sm:text-4xl">
           {profile?.name ? `Hi, ${profile.name}` : "Hi there"}
         </h1>
@@ -110,7 +113,7 @@ export default async function DashboardPage() {
               </LinkButton>
             </div>
           ) : (
-            <p className="text-sm text-ink-faint">Rest — however you want to spend it.</p>
+            <p className="text-sm text-ink-faint">Rest, however you want to spend it.</p>
           )}
         </Card>
       </div>

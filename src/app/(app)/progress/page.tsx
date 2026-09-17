@@ -1,9 +1,12 @@
 import { subDays, startOfWeek, format, differenceInCalendarDays } from "date-fns";
+import { LineChart } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthedUser } from "@/lib/supabase/get-user";
 import { formatDateISO } from "@/lib/utils";
 import { computeStreak } from "@/lib/streaks";
 import { NUTRITION_GOAL_CATEGORIES } from "@/lib/data/nutrition";
 import { Card } from "@/components/ui/card";
+import { PageHeading } from "@/components/page-heading";
 import { ExerciseProgressionSection } from "@/components/exercise-progression-section";
 import {
   WeeklyConsistencyChart,
@@ -14,12 +17,10 @@ import {
 } from "@/components/charts";
 
 export default async function ProgressPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthedUser();
   if (!user) return null;
 
+  const supabase = await createClient();
   const ninetyDaysAgo = formatDateISO(subDays(new Date(), 90));
   const fourteenDaysAgo = formatDateISO(subDays(new Date(), 13));
   const sevenDaysAgo = formatDateISO(subDays(new Date(), 6));
@@ -132,12 +133,12 @@ export default async function ProgressPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-serif-display text-3xl text-ink">Your progress</h1>
-        <p className="mt-1 text-ink-soft">
-          A reflection of your patterns, not a performance review.
-        </p>
-      </div>
+      <PageHeading
+        icon={LineChart}
+        title="Your progress"
+        subtitle="A reflection of your patterns, not a performance review."
+        accentClass="bg-water/20 text-water"
+      />
 
       {longestHabitStreak > 0 && (
         <Card className="bg-sage/10">

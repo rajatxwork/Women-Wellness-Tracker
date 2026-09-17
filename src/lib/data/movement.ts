@@ -163,7 +163,7 @@ export const BODYWEIGHT_PROGRESSION: Record<
   { label: string; exercises: BodyweightProgressionExercise[] }
 > = {
   1: {
-    label: "Level 1 — Building Your Foundation",
+    label: "Level 1: Building Your Foundation",
     exercises: [
       { exercise: "Box squats using a chair", pattern: "squat" },
       { exercise: "Floor glute bridges", pattern: "hinge" },
@@ -174,7 +174,7 @@ export const BODYWEIGHT_PROGRESSION: Record<
     ],
   },
   2: {
-    label: "Level 2 — Increasing the Challenge",
+    label: "Level 2: Increasing the Challenge",
     exercises: [
       { exercise: "Full depth bodyweight squats", pattern: "squat" },
       { exercise: "Single leg glute bridges", pattern: "hinge" },
@@ -192,7 +192,7 @@ export const BODYWEIGHT_PROGRESSION: Record<
     ],
   },
   3: {
-    label: "Level 3 — Mastering Single Leg & Single Arm Work",
+    label: "Level 3: Mastering Single Leg & Single Arm Work",
     exercises: [
       { exercise: "Pistol squats", pattern: "squat" },
       {
@@ -253,15 +253,15 @@ export const WEEKLY_STRUCTURE = [
 ];
 
 export const FORM_PRINCIPLES = [
-  "Control the lowering part of every movement — slowing the descent over two to three seconds creates more useful muscle tension than dropping quickly.",
+  "Control the lowering part of every movement, slowing the descent over two to three seconds creates more useful muscle tension than dropping quickly.",
   "Keep three points of contact on the ground during lower body moves: the base of your big toe, the base of your pinky toe, and your heel.",
-  "Keep your ribs gently drawn down toward your hips — avoid letting your lower back arch excessively during presses or squats.",
+  "Keep your ribs gently drawn down toward your hips, avoid letting your lower back arch excessively during presses or squats.",
 ];
 
 export const WARMUP_TIPS = [
-  "Dynamic movement, not static stretching, beforehand — gentle cat-cow stretches and bodyweight squats raise your muscle temperature.",
+  "Dynamic movement, not static stretching, beforehand, gentle cat-cow stretches and bodyweight squats raise your muscle temperature.",
   "Save static, held stretches for afterward, as part of your cool down.",
-  "A few minutes is genuinely enough — just enough to feel noticeably looser and more awake.",
+  "A few minutes is genuinely enough, just enough to feel noticeably looser and more awake.",
 ];
 
 export const ACTIVE_RECOVERY_OPTIONS = [
@@ -273,7 +273,7 @@ export const ACTIVE_RECOVERY_OPTIONS = [
   {
     name: "Mobility and dynamic stretching",
     detail:
-      "Moving your joints through their full range — hip openers, cat-cow stretches, gentle spine rotations, and ankle mobility work.",
+      "Moving your joints through their full range, hip openers, cat-cow stretches, gentle spine rotations, and ankle mobility work.",
   },
   {
     name: "Foam rolling",
@@ -295,6 +295,6 @@ export const RECOVERY_FLOW_15MIN = [
   {
     minutes: 5,
     activity:
-      "A simple mobility circuit — cat-cow stretches, a gentle full body stretch sequence, and legs up the wall",
+      "A simple mobility circuit, cat-cow stretches, a gentle full body stretch sequence, and legs up the wall",
   },
 ];

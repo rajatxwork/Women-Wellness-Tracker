@@ -1,24 +1,25 @@
+import { Moon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthedUser, getProfile } from "@/lib/supabase/get-user";
 import { todayISO } from "@/lib/utils";
 import { computeCycleStatus } from "@/lib/cycle";
 import { CYCLE_PHASES } from "@/lib/data/cycle-phases";
 import { getPhaseTip } from "@/lib/encouragement";
 import { Card } from "@/components/ui/card";
+import { PageHeading } from "@/components/page-heading";
 import { SymptomLogForm } from "@/components/symptom-log-form";
 import { PeriodLogForm } from "@/components/period-log-form";
 import { CycleCalendar, buildPredictedPeriod } from "@/components/cycle-calendar";
 
 export default async function CyclePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthedUser();
   if (!user) return null;
 
+  const supabase = await createClient();
   const today = todayISO();
 
-  const [{ data: profile }, { data: cycleLogs }, { data: todaySymptoms }] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+  const [profile, { data: cycleLogs }, { data: todaySymptoms }] = await Promise.all([
+    getProfile(user.id),
     supabase
       .from("cycle_logs")
       .select("*")
@@ -48,12 +49,11 @@ export default async function CyclePage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-serif-display text-3xl text-ink">Your cycle</h1>
-        <p className="mt-1 text-ink-soft">
-          Tracked gently, not obsessively — just enough to understand your own patterns.
-        </p>
-      </div>
+      <PageHeading
+        icon={Moon}
+        title="Your cycle"
+        subtitle="Tracked gently, not obsessively, just enough to understand your own patterns."
+      />
 
       {cycleStatus ? (
         <Card className="bg-blush/30">

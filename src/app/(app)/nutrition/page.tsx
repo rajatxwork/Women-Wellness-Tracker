@@ -1,5 +1,6 @@
 import { subDays } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthedUser, getProfile } from "@/lib/supabase/get-user";
 import { todayISO, formatDateISO } from "@/lib/utils";
 import { NUTRITION_GOAL_CATEGORIES } from "@/lib/data/nutrition";
 import { Card } from "@/components/ui/card";
@@ -7,27 +8,33 @@ import { WaterRing } from "@/components/water-ring";
 import { GoalCategoryPicker } from "@/components/goal-category-picker";
 import { NutritionChecklist } from "@/components/nutrition-checklist";
 import { MealNoteField } from "@/components/meal-note-field";
+import { Apple } from "lucide-react";
+import { PageHeading } from "@/components/page-heading";
 import { NutritionCoverage } from "@/components/nutrition-coverage";
+import { NutrientCalculator } from "@/components/nutrient-calculator";
+import { NutrientTargetsTable } from "@/components/nutrient-targets-table";
+import { SupplementTracker } from "@/components/supplement-tracker";
 
 export default async function NutritionPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthedUser();
   if (!user) return null;
 
+  const supabase = await createClient();
   const today = todayISO();
   const weekAgo = formatDateISO(subDays(new Date(), 6));
 
   const [
-    { data: profile },
+    profile,
     { data: userGoals },
     { data: waterLogs },
     { data: todayLogs },
     { data: todayNote },
     { data: weekLogs },
+    { data: nutrientTargets },
+    { data: supplements },
+    { data: supplementLogsToday },
   ] = await Promise.all([
-    supabase.from("profiles").select("water_goal_ml").eq("id", user.id).maybeSingle(),
+    getProfile(user.id),
     supabase.from("user_goal_categories").select("category_slug").eq("user_id", user.id),
     supabase.from("water_logs").select("amount_ml").eq("user_id", user.id).eq("log_date", today),
     supabase
@@ -46,6 +53,17 @@ export default async function NutritionPage() {
       .select("category_slug, log_date")
       .eq("user_id", user.id)
       .gte("log_date", weekAgo),
+    supabase
+      .from("nutrient_targets")
+      .select("id, nutrient_name, category, target_amount, unit")
+      .eq("user_id", user.id)
+      .order("nutrient_name"),
+    supabase
+      .from("supplements")
+      .select("id, name, dosage")
+      .eq("user_id", user.id)
+      .order("created_at"),
+    supabase.from("supplement_logs").select("supplement_id").eq("user_id", user.id).eq("log_date", today),
   ]);
 
   const focusSlugs = (userGoals ?? []).map((g) => g.category_slug);
@@ -68,14 +86,30 @@ export default async function NutritionPage() {
 
   const focusCategories = NUTRITION_GOAL_CATEGORIES.filter((c) => focusSlugs.includes(c.slug));
 
+  const targetRows = (nutrientTargets ?? []).map((t) => ({
+    id: t.id,
+    nutrientName: t.nutrient_name,
+    category: t.category,
+    targetAmount: t.target_amount,
+    unit: t.unit,
+  }));
+
+  const takenTodaySet = new Set((supplementLogsToday ?? []).map((s) => s.supplement_id));
+  const supplementItems = (supplements ?? []).map((s) => ({
+    id: s.id,
+    name: s.name,
+    dosage: s.dosage,
+    takenToday: takenTodaySet.has(s.id),
+  }));
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-serif-display text-3xl text-ink">Nutrition</h1>
-        <p className="mt-1 text-ink-soft">
-          Not about counting calories — about noticing what your body&apos;s actually asking for.
-        </p>
-      </div>
+      <PageHeading
+        icon={Apple}
+        title="Nutrition"
+        subtitle="Not about counting calories, about noticing what your body's actually asking for."
+        accentClass="bg-sage/25 text-sage-deep"
+      />
 
       <div className="grid gap-6 sm:grid-cols-2">
         <Card>
@@ -95,7 +129,7 @@ export default async function NutritionPage() {
       <Card>
         <h2 className="mb-1 font-serif-display text-lg text-ink">Your focus areas</h2>
         <p className="mb-4 text-sm text-ink-soft">
-          Pick a few things you actually care about right now — you can change these any time.
+          Pick a few things you actually care about right now, you can change these any time.
         </p>
         <GoalCategoryPicker initialSlugs={focusSlugs} />
       </Card>
@@ -108,9 +142,35 @@ export default async function NutritionPage() {
       <Card>
         <h2 className="mb-1 font-serif-display text-lg text-ink">This week&apos;s coverage</h2>
         <p className="mb-4 text-sm text-ink-soft">
-          Just a reflection of your last 7 days — not a scorecard.
+          Just a reflection of your last 7 days, not a scorecard.
         </p>
         <NutritionCoverage rows={coverageRows} />
+      </Card>
+
+      <Card>
+        <h2 className="mb-1 font-serif-display text-lg text-ink">Nutrient calculator</h2>
+        <p className="mb-4 text-sm text-ink-soft">
+          A quick, science-based estimate of your daily needs, built from your height,
+          weight, activity, and goal.
+        </p>
+        <NutrientCalculator />
+      </Card>
+
+      <Card>
+        <h2 className="mb-1 font-serif-display text-lg text-ink">Your macro & micro targets</h2>
+        <p className="mb-4 text-sm text-ink-soft">
+          A personal reference sheet, prefill it from the calculator above or build it
+          yourself.
+        </p>
+        <NutrientTargetsTable targets={targetRows} />
+      </Card>
+
+      <Card>
+        <h2 className="mb-1 font-serif-display text-lg text-ink">Supplements</h2>
+        <p className="mb-4 text-sm text-ink-soft">
+          Keep track of what you&apos;re taking, and whether today&apos;s the day you took it.
+        </p>
+        <SupplementTracker supplements={supplementItems} />
       </Card>
 
       {focusCategories.length > 0 && (
@@ -124,7 +184,7 @@ export default async function NutritionPage() {
                 {cat.foods.map((food) => (
                   <li key={food.food} className="text-sm">
                     <span className="font-medium text-ink">{food.food}</span>
-                    <span className="text-ink-soft"> — {food.why}</span>
+                    <span className="text-ink-soft">: {food.why}</span>
                   </li>
                 ))}
               </ul>

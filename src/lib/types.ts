@@ -55,6 +55,34 @@ export type WaterLog = {
   logged_at: string;
 };
 
+export type NutrientTarget = {
+  id: string;
+  user_id: string;
+  nutrient_name: string;
+  category: "macro" | "micro";
+  target_amount: number;
+  unit: string;
+  created_at: string;
+};
+
+export type Supplement = {
+  id: string;
+  user_id: string;
+  name: string;
+  dosage: string | null;
+  notes: string | null;
+  created_at: string;
+};
+
+export type SupplementLog = {
+  id: string;
+  supplement_id: string;
+  user_id: string;
+  log_date: string;
+  taken: boolean;
+  created_at: string;
+};
+
 export type WorkoutSession = {
   id: string;
   user_id: string;
@@ -69,7 +97,8 @@ export type WorkoutSet = {
   id: string;
   session_id: string;
   user_id: string;
-  pattern_slug: string;
+  pattern_slug: string | null;
+  bundle_id: string | null;
   exercise_name: string;
   variant: "gym" | "home-weights" | "bodyweight" | null;
   set_number: number;
@@ -78,6 +107,42 @@ export type WorkoutSet = {
   is_bodyweight: boolean;
   bodyweight_level: 1 | 2 | 3 | null;
   harder_variant_markers: string[];
+  created_at: string;
+};
+
+export type ExerciseBundle = {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+};
+
+export type CustomExercise = {
+  id: string;
+  user_id: string;
+  name: string;
+  pattern_slug: string | null;
+  bundle_id: string | null;
+  variant: "gym" | "home-weights" | "bodyweight" | null;
+  created_at: string;
+};
+
+export type Program = {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+};
+
+export type ProgramItem = {
+  id: string;
+  program_id: string;
+  user_id: string;
+  pattern_slug: string | null;
+  bundle_id: string | null;
+  exercise_name: string;
+  variant: "gym" | "home-weights" | "bodyweight" | null;
+  sort_order: number;
   created_at: string;
 };
 

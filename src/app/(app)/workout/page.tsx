@@ -1,35 +1,60 @@
-import { startOfWeek, endOfWeek, differenceInCalendarDays } from "date-fns";
+import { startOfWeek, endOfWeek, differenceInCalendarDays, subDays } from "date-fns";
+import { Dumbbell } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthedUser, getProfile } from "@/lib/supabase/get-user";
 import { formatDateISO } from "@/lib/utils";
 import { MOVEMENT_PATTERNS, BODYWEIGHT_PROGRESSION } from "@/lib/data/movement";
 import type { AgeBand } from "@/lib/data/plyometrics";
 import { Card } from "@/components/ui/card";
+import { PageHeading } from "@/components/page-heading";
 import { WorkoutSessionForm } from "@/components/workout-session-form";
 import { CardioForm, PlyoForm, RecoveryForm } from "@/components/cardio-plyo-recovery-forms";
 import { WeeklyStructureView } from "@/components/weekly-structure-view";
+import { CustomExerciseManager } from "@/components/custom-exercise-manager";
+import { ProgramSection } from "@/components/program-section";
 
 export default async function WorkoutPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthedUser();
   if (!user) return null;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("age_band")
-    .eq("id", user.id)
-    .maybeSingle();
-
+  const supabase = await createClient();
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
   const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 });
 
-  const { data: weekSessions } = await supabase
-    .from("workout_sessions")
-    .select("session_date")
-    .eq("user_id", user.id)
-    .gte("session_date", formatDateISO(weekStart))
-    .lte("session_date", formatDateISO(weekEnd));
+  const [
+    profile,
+    { data: weekSessions },
+    { data: bundles },
+    { data: customExercises },
+    { data: programs },
+    { data: programItems },
+    { data: recentSets },
+  ] = await Promise.all([
+    getProfile(user.id),
+    supabase
+      .from("workout_sessions")
+      .select("session_date")
+      .eq("user_id", user.id)
+      .gte("session_date", formatDateISO(weekStart))
+      .lte("session_date", formatDateISO(weekEnd)),
+    supabase.from("exercise_bundles").select("id, name").eq("user_id", user.id).order("created_at"),
+    supabase
+      .from("custom_exercises")
+      .select("id, name, pattern_slug, bundle_id, variant")
+      .eq("user_id", user.id)
+      .order("created_at"),
+    supabase.from("programs").select("id, name").eq("user_id", user.id).order("created_at"),
+    supabase
+      .from("program_items")
+      .select("id, program_id, exercise_name, pattern_slug, bundle_id, variant, sort_order")
+      .eq("user_id", user.id)
+      .order("sort_order"),
+    supabase
+      .from("workout_sets")
+      .select("exercise_name, reps, weight_kg, workout_sessions!inner(session_date)")
+      .eq("user_id", user.id)
+      .gte("workout_sessions.session_date", formatDateISO(subDays(new Date(), 180))),
+  ]);
 
   const completedByDayIndex = Array(7).fill(false);
   for (const session of weekSessions ?? []) {
@@ -37,14 +62,55 @@ export default async function WorkoutPage() {
     if (idx >= 0 && idx < 7) completedByDayIndex[idx] = true;
   }
 
+  const entriesByExercise = new Map<
+    string,
+    { date: string; reps: number | null; weightKg: number | null }[]
+  >();
+  for (const s of recentSets ?? []) {
+    const session = s.workout_sessions as unknown as { session_date: string } | null;
+    if (!session) continue;
+    if (!entriesByExercise.has(s.exercise_name)) entriesByExercise.set(s.exercise_name, []);
+    entriesByExercise.get(s.exercise_name)!.push({
+      date: session.session_date,
+      reps: s.reps,
+      weightKg: s.weight_kg,
+    });
+  }
+  for (const entries of entriesByExercise.values()) {
+    entries.sort((a, b) => b.date.localeCompare(a.date));
+  }
+
+  const programViews = (programs ?? []).map((p) => ({
+    id: p.id,
+    name: p.name,
+    items: (programItems ?? [])
+      .filter((it) => it.program_id === p.id)
+      .map((it) => ({
+        id: it.id,
+        exerciseName: it.exercise_name,
+        patternSlug: it.pattern_slug,
+        bundleId: it.bundle_id,
+        variant: it.variant,
+        recentEntries: (entriesByExercise.get(it.exercise_name) ?? []).slice(0, 5),
+      })),
+  }));
+
+  const customExerciseViews = (customExercises ?? []).map((c) => ({
+    id: c.id,
+    name: c.name,
+    patternSlug: c.pattern_slug,
+    bundleId: c.bundle_id,
+    variant: c.variant,
+  }));
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-serif-display text-3xl text-ink">Movement</h1>
-        <p className="mt-1 text-ink-soft">
-          Full body, three days a week, with room to breathe around it.
-        </p>
-      </div>
+      <PageHeading
+        icon={Dumbbell}
+        title="Movement"
+        subtitle="Full body, three days a week, with room to breathe around it."
+        accentClass="bg-terracotta/15 text-terracotta-deep"
+      />
 
       <Card>
         <h2 className="mb-4 font-serif-display text-lg text-ink">This week</h2>
@@ -54,6 +120,28 @@ export default async function WorkoutPage() {
       <Card>
         <h2 className="mb-4 font-serif-display text-lg text-ink">Log a strength session</h2>
         <WorkoutSessionForm />
+      </Card>
+
+      <Card>
+        <h2 className="mb-1 font-serif-display text-lg text-ink">Your programs</h2>
+        <p className="mb-4 text-sm text-ink-soft">
+          Build your own plan from whatever movements you choose, then track them here
+          over time.
+        </p>
+        <ProgramSection
+          programs={programViews}
+          bundles={bundles ?? []}
+          customExercises={customExerciseViews}
+        />
+      </Card>
+
+      <Card>
+        <h2 className="mb-1 font-serif-display text-lg text-ink">Your own exercises</h2>
+        <p className="mb-4 text-sm text-ink-soft">
+          Not everything fits the book&apos;s 8 patterns. Add your own and bundle them
+          however makes sense to you.
+        </p>
+        <CustomExerciseManager bundles={bundles ?? []} customExercises={customExerciseViews} />
       </Card>
 
       <div className="grid gap-6 sm:grid-cols-2">

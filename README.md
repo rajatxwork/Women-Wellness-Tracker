@@ -1,4 +1,4 @@
-# Selene — Women's Wellness Tracker
+# Selene: Women's Wellness Tracker
 
 A warm, editorial companion app for the wellness e-book: cycle tracking, goal-based
 nutrition, a 3-day strength program, habits, tasks, and reflective analytics.
@@ -26,13 +26,28 @@ Built with Next.js (App Router), TypeScript, Tailwind CSS, and Supabase.
    npm run dev
    ```
 
-   Visit [http://localhost:3000](http://localhost:3000) — you'll land on the
+   Visit [http://localhost:3000](http://localhost:3000), you'll land on the
    sign-up page.
 
 5. **Email confirmation.** By default Supabase requires email confirmation for
    new sign-ups. Either confirm via the email Supabase sends, or turn off
    "Confirm email" under Authentication → Providers → Email in your Supabase
    dashboard for faster local testing.
+6. **Password reset email template.** For "Forgot your password?" to work,
+   open Authentication → Email Templates → Reset Password in your Supabase
+   dashboard and change the link in the template from `{{ .ConfirmationURL }}`
+   to:
+
+   ```
+   {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password
+   ```
+
+   This routes the reset link through the app's own `/auth/confirm` handler
+   instead of Supabase's default hosted redirect. Also add your production
+   URL under Authentication → URL Configuration → Redirect URLs (and set
+   `NEXT_PUBLIC_SITE_URL` in your environment variables once you have a
+   deployed URL, so reset emails link to the right place instead of
+   `localhost`).
 
 ## Deploying to Vercel
 
@@ -42,19 +57,19 @@ variables. See the step-by-step walkthrough below.
 
 ## Project structure
 
-- `src/app/(app)/` — the authenticated app shell (dashboard, cycle, nutrition,
+- `src/app/(app)/`, the authenticated app shell (dashboard, cycle, nutrition,
   workout, habits, progress), protected by `src/proxy.ts` (Next's middleware
   convention) and the layout's session check.
-- `src/app/login`, `src/app/signup`, `src/app/onboarding` — auth flow.
-- `src/app/actions/` — server actions for all mutations (water, habits, tasks,
+- `src/app/login`, `src/app/signup`, `src/app/onboarding`, auth flow.
+- `src/app/actions/`, server actions for all mutations (water, habits, tasks,
   cycle, nutrition, workout logging).
-- `src/lib/data/` — reference content extracted from the companion e-book:
+- `src/lib/data/`, reference content extracted from the companion e-book:
   nutrition goal categories & foods, movement patterns & exercises, bodyweight
   progression levels, plyometric sets by age band, cardio guidance, and
   cycle-phase tips.
-- `src/lib/encouragement.ts` — the app's voice: rotating, categorized copy for
+- `src/lib/encouragement.ts`, the app's voice: rotating, categorized copy for
   celebrations, gentle nudges, streaks, phase tips, and empty states.
-- `schema.sql` — full Postgres schema with RLS policies and seed data, ready to
+- `schema.sql`, full Postgres schema with RLS policies and seed data, ready to
   run in the Supabase SQL editor.
 
 ## Design system
