@@ -13,6 +13,7 @@ import { WorkoutSessionForm } from "@/components/workout-session-form";
 import { CardioForm, PlyoForm, RecoveryForm } from "@/components/cardio-plyo-recovery-forms";
 import { CustomExerciseManager } from "@/components/custom-exercise-manager";
 import { TrainingGoalSetup } from "@/components/training-goal-setup";
+import { DynamicStretchLinks } from "@/components/dynamic-stretch-links";
 import { WeeklyPlanBuilder, type DayView, type PlanItemView } from "@/components/weekly-plan-builder";
 
 const DAY_LABELS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -161,6 +162,9 @@ export default async function WorkoutPage() {
         <p className="mb-4 text-sm text-ink-soft">
           Set each day&apos;s type, then add whatever movements you want to it, this is your program.
         </p>
+        <div className="mb-4">
+          <DynamicStretchLinks />
+        </div>
         <WeeklyPlanBuilder
           days={days}
           bundles={bundles ?? []}

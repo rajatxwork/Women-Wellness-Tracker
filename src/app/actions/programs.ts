@@ -68,6 +68,58 @@ export async function addWeekMovement(input: {
   revalidatePath("/workout");
 }
 
+// Applies a full goal-based recommendation in one go: sets every day's type
+// and, for strength days, adds the suggested movements too, so "build my
+// week for me" actually leaves a filled-in week rather than just labels.
+export async function applyRecommendedProgram(input: {
+  days: {
+    dayOfWeek: number;
+    dayType: "strength" | "cardio" | "recovery" | "rest";
+    exercises: { patternSlug: string; exerciseName: string }[];
+  }[];
+  variant: "gym" | "home-weights" | "bodyweight";
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not signed in");
+
+  const { error: planDaysError } = await supabase.from("plan_days").upsert(
+    input.days.map((d) => ({ user_id: user.id, day_of_week: d.dayOfWeek, day_type: d.dayType })),
+    { onConflict: "user_id,day_of_week" },
+  );
+  if (planDaysError) throw planDaysError;
+
+  const programId = await getOrCreateWeekProgram(supabase, user.id);
+
+  for (const day of input.days) {
+    if (day.exercises.length === 0) continue;
+
+    const { count } = await supabase
+      .from("program_items")
+      .select("id", { count: "exact", head: true })
+      .eq("program_id", programId)
+      .eq("day_of_week", day.dayOfWeek);
+
+    const { error } = await supabase.from("program_items").insert(
+      day.exercises.map((ex, i) => ({
+        program_id: programId,
+        user_id: user.id,
+        exercise_name: ex.exerciseName,
+        pattern_slug: ex.patternSlug,
+        bundle_id: null,
+        variant: input.variant,
+        day_of_week: day.dayOfWeek,
+        sort_order: (count ?? 0) + i,
+      })),
+    );
+    if (error) throw error;
+  }
+
+  revalidatePath("/workout");
+}
+
 export async function removeProgramItem(itemId: string) {
   const supabase = await createClient();
   const {

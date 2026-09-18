@@ -1,17 +1,13 @@
-// Goal-first intake for the Workout page. The book's own weekly structure
-// (movement.ts WEEKLY_STRUCTURE) is a fairly universal recommendation, so
-// "personalizing" a program means: carrying that baseline through, picking
-// a sensible default exercise variant from age/training level, and
-// surfacing the book's own goal-specific "why" tips (already written for
-// nutrition and cardio) rather than inventing new copy or a fake algorithm.
-import { WEEKLY_STRUCTURE, type MovementVariant, type BodyweightLevel } from "@/lib/data/movement";
-import { CARDIO_GOAL_TIPS, CARDIO_WEEKLY_TARGETS } from "@/lib/data/cardio";
-import { NUTRITION_GOAL_CATEGORIES } from "@/lib/data/nutrition";
+// Goal-first intake for the Workout page. Each goal maps to a concrete,
+// opinionated weekly template (which days, what kind, what body focus, what
+// rep range), so picking one gives a real program, not just a vibe.
+import { MOVEMENT_PATTERNS, type MovementVariant, type BodyweightLevel } from "@/lib/data/movement";
 import type { PlanDay } from "@/lib/types";
 
 export type AgeBand = "20s-30s" | "30s-50s" | "60-plus";
 export type TrainingLevel = "beginner" | "intermediate" | "advanced";
 export type DayType = PlanDay["day_type"];
+export type DayFocus = "full" | "upper" | "lower" | null;
 
 export const AGE_BAND_OPTIONS: { value: AgeBand; label: string }[] = [
   { value: "20s-30s", label: "20s to 30s" },
@@ -49,75 +45,170 @@ export const TRAINING_LEVEL_OPTIONS: {
   },
 ];
 
+export type WorkoutGoalSlug =
+  | "general-health"
+  | "strength-muscle"
+  | "heart-health"
+  | "lower-body-focus"
+  | "fat-loss";
+
 export type WorkoutGoal = {
-  slug: string;
+  slug: WorkoutGoalSlug;
   name: string;
   blurb: string;
+  structureSummary: string;
+  repRange: string;
+  repRangeWhy: string;
 };
 
-// A workout-flavored subset: two general-purpose goals, plus every existing
-// goal slug that already has cardio-specific "why" tips written for it.
 export const WORKOUT_GOALS: WorkoutGoal[] = [
   {
-    slug: "general-wellness",
-    name: "General health",
-    blurb: "A solid, sustainable baseline, nothing specific, just feeling good.",
+    slug: "general-health",
+    name: "General health & overall fitness",
+    blurb: "A solid, sustainable baseline, nothing specific, just feeling good and staying capable.",
+    structureSummary: "3 full body strength days, 2 cardio days, active recovery worked in.",
+    repRange: "8–12 reps",
+    repRangeWhy: "A middle ground that builds a bit of everything, strength, muscle, and endurance.",
   },
   {
-    slug: "build-strength",
-    name: "Build strength & muscle",
+    slug: "strength-muscle",
+    name: "Strength & muscle building",
     blurb: "Getting visibly and measurably stronger over time.",
+    structureSummary: "4 day upper/lower split, balanced, with cardio and plyo worked in around it.",
+    repRange: "6–10 reps",
+    repRangeWhy: "Heavier loads for fewer reps is what actually drives strength and size over time.",
   },
-  ...CARDIO_GOAL_TIPS.map((g) => {
-    const cat = NUTRITION_GOAL_CATEGORIES.find((c) => c.slug === g.goalSlug);
-    return { slug: g.goalSlug, name: cat?.name ?? g.goalSlug, blurb: cat?.tagline ?? "" };
-  }),
+  {
+    slug: "heart-health",
+    name: "Better heart health",
+    blurb: "Cardio-forward, with enough lifting to keep your muscle and bones strong.",
+    structureSummary: "Cardio heavy, 3 cardio days, plus 2 full body lifting days.",
+    repRange: "12–15 reps",
+    repRangeWhy: "Higher reps with shorter rest keeps your heart rate up during your lifting days too.",
+  },
+  {
+    slug: "lower-body-focus",
+    name: "Lower body focus",
+    blurb: "More squat, hinge, and leg work in the mix, without dropping everything else.",
+    structureSummary: "Lower body dominant split, 3 lower days, 1 upper day, cardio and recovery around it.",
+    repRange: "8–12 reps",
+    repRangeWhy: "A dependable range for building strength and shape through your legs and glutes.",
+  },
+  {
+    slug: "fat-loss",
+    name: "Fat loss",
+    blurb: "A balanced, sustainable mix of lifting and cardio, built so you can actually keep it up.",
+    structureSummary: "3 lifting days, 3 cardio days, with active recovery or rest worked in.",
+    repRange: "10–15 reps",
+    repRangeWhy: "Moderate weight, higher reps, and shorter rest keeps total effort and calorie burn high.",
+  },
 ];
 
-export function tipsForGoal(slug: string): string[] {
-  return CARDIO_GOAL_TIPS.find((g) => g.goalSlug === slug)?.tips ?? [];
+const DAY_LABELS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+const FULL_BODY_PATTERNS = ["squat", "hinge", "pull", "push-press"] as const;
+const UPPER_PATTERNS = ["pull", "push-press", "shoulders", "arms"] as const;
+const LOWER_PATTERNS = ["squat", "hinge", "quads-adductors-abductors", "calves"] as const;
+
+function patternsForFocus(focus: DayFocus): readonly string[] {
+  if (focus === "upper") return UPPER_PATTERNS;
+  if (focus === "lower") return LOWER_PATTERNS;
+  return FULL_BODY_PATTERNS;
 }
 
 export type RecommendedDay = {
   dayOfWeek: number; // 1 = Monday ... 7 = Sunday
   label: string;
   dayType: DayType;
-  focus: string;
+  focus: DayFocus;
+  note: string;
+};
+
+type DayTemplate = { dayType: DayType; focus: DayFocus; note: string };
+
+const GOAL_TEMPLATES: Record<WorkoutGoalSlug, DayTemplate[]> = {
+  "general-health": [
+    { dayType: "strength", focus: "full", note: "Full body strength" },
+    { dayType: "cardio", focus: null, note: "Cardio, your choice of pace" },
+    { dayType: "strength", focus: "full", note: "Full body strength" },
+    { dayType: "recovery", focus: null, note: "Active recovery or a gentle walk" },
+    { dayType: "strength", focus: "full", note: "Full body strength" },
+    { dayType: "cardio", focus: null, note: "Cardio, your choice of pace" },
+    { dayType: "rest", focus: null, note: "Rest" },
+  ],
+  "strength-muscle": [
+    { dayType: "strength", focus: "upper", note: "Upper body" },
+    { dayType: "strength", focus: "lower", note: "Lower body" },
+    { dayType: "cardio", focus: null, note: "Light cardio or a plyometric session" },
+    { dayType: "strength", focus: "upper", note: "Upper body" },
+    { dayType: "strength", focus: "lower", note: "Lower body" },
+    { dayType: "cardio", focus: null, note: "Cardio, your choice of pace" },
+    { dayType: "rest", focus: null, note: "Rest" },
+  ],
+  "heart-health": [
+    { dayType: "cardio", focus: null, note: "Cardio" },
+    { dayType: "strength", focus: "full", note: "Full body strength" },
+    { dayType: "cardio", focus: null, note: "Cardio" },
+    { dayType: "recovery", focus: null, note: "Active recovery" },
+    { dayType: "strength", focus: "full", note: "Full body strength" },
+    { dayType: "cardio", focus: null, note: "Cardio" },
+    { dayType: "rest", focus: null, note: "Rest" },
+  ],
+  "lower-body-focus": [
+    { dayType: "strength", focus: "lower", note: "Lower body" },
+    { dayType: "strength", focus: "upper", note: "Upper body" },
+    { dayType: "cardio", focus: null, note: "Cardio, your choice of pace" },
+    { dayType: "strength", focus: "lower", note: "Lower body" },
+    { dayType: "recovery", focus: null, note: "Active recovery" },
+    { dayType: "strength", focus: "lower", note: "Lower body" },
+    { dayType: "rest", focus: null, note: "Rest" },
+  ],
+  "fat-loss": [
+    { dayType: "strength", focus: "full", note: "Full body strength" },
+    { dayType: "cardio", focus: null, note: "Cardio" },
+    { dayType: "strength", focus: "full", note: "Full body strength" },
+    { dayType: "cardio", focus: null, note: "Cardio" },
+    { dayType: "strength", focus: "full", note: "Full body strength" },
+    { dayType: "cardio", focus: null, note: "Cardio" },
+    { dayType: "recovery", focus: null, note: "Active recovery or rest, your call" },
+  ],
 };
 
 export type Recommendation = {
+  goal: WorkoutGoal;
   days: RecommendedDay[];
-  cardioNote: string;
-  strengthNote: string;
-  tips: string[];
+  disclaimer: string;
 };
 
-const DAY_LABELS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-// Maps the book's own WEEKLY_STRUCTURE onto the day_type enum plan_days
-// uses. "plyo" doesn't have its own plan_days slot (it lives alongside
-// cardio on the book's flexible day 6), so it folds into "cardio".
-function toDayType(type: (typeof WEEKLY_STRUCTURE)[number]["type"]): DayType {
-  if (type === "recovery") return "recovery";
-  if (type === "rest") return "rest";
-  if (type === "cardio") return "cardio";
-  return "strength";
-}
-
-export function buildRecommendation(goalSlugs: string[]): Recommendation {
-  const days: RecommendedDay[] = WEEKLY_STRUCTURE.map((d, i) => ({
-    dayOfWeek: d.day,
+export function buildRecommendation(goalSlug: WorkoutGoalSlug): Recommendation {
+  const goal = WORKOUT_GOALS.find((g) => g.slug === goalSlug)!;
+  const template = GOAL_TEMPLATES[goalSlug];
+  const days: RecommendedDay[] = template.map((t, i) => ({
+    dayOfWeek: i + 1,
     label: DAY_LABELS[i],
-    dayType: toDayType(d.type),
-    focus: d.focus,
+    dayType: t.dayType,
+    focus: t.focus,
+    note: t.note,
   }));
 
-  const tips = goalSlugs.flatMap(tipsForGoal).slice(0, 4);
-
   return {
+    goal,
     days,
-    strengthNote: "Three full body strength sessions a week, the book's baseline for building and keeping muscle.",
-    cardioNote: `${CARDIO_WEEKLY_TARGETS.moderateMinutesLow}–${CARDIO_WEEKLY_TARGETS.moderateMinutesHigh} min of moderate cardio a week (or ${CARDIO_WEEKLY_TARGETS.vigorousMinutesLow}–${CARDIO_WEEKLY_TARGETS.vigorousMinutesHigh} min vigorous), spread across your cardio day.`,
-    tips,
+    disclaimer:
+      "A general starting point based on the book's guidance, not personalized medical or professional advice. Ease in, adjust anything that doesn't feel right, and check with a doctor first if you're new to exercise or managing a health condition.",
   };
+}
+
+// Suggests one exercise per pattern relevant to a day's focus, at the given
+// variant, so "build my week for me" has actual movements to add rather
+// than just a labeled day.
+export function suggestedExercisesForDay(focus: DayFocus, variant: MovementVariant) {
+  const slugs = patternsForFocus(focus);
+  return slugs.map((slug) => {
+    const pattern = MOVEMENT_PATTERNS.find((p) => p.slug === slug)!;
+    return {
+      patternSlug: pattern.slug,
+      exerciseName: pattern.exercises[variant]?.[0] ?? pattern.exercises.bodyweight[0],
+    };
+  });
 }
