@@ -11,6 +11,7 @@ import {
   LineChart,
   LogOut,
   Settings,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -21,6 +22,7 @@ const NAV_ITEMS = [
   { href: "/cycle", label: "Cycle", icon: CycleIcon },
   { href: "/nutrition", label: "Nutrition", icon: Apple },
   { href: "/workout", label: "Workout", icon: Dumbbell },
+  { href: "/library", label: "Library", icon: BookOpen },
   { href: "/habits", label: "Habits", icon: ListChecks },
   { href: "/progress", label: "Progress", icon: LineChart },
 ];
