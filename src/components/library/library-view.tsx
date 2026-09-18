@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { ChapterNav, type LibraryChapter, type LibraryChapterSlug } from "@/components/library/chapter-nav";
 import { NutritionChapter } from "@/components/library/nutrition-chapter";
 import { CardioChapter } from "@/components/library/cardio-chapter";
@@ -43,16 +44,34 @@ const CHAPTERS: LibraryChapter[] = [
   },
 ];
 
+const VALID_CHAPTERS = CHAPTERS.map((c) => c.slug);
+
 export function LibraryView() {
-  const [activeChapter, setActiveChapter] = useState<LibraryChapterSlug>("nutrition");
+  const searchParams = useSearchParams();
+  const requestedChapter = searchParams.get("chapter");
+  const initialChapter = VALID_CHAPTERS.includes(requestedChapter as LibraryChapterSlug)
+    ? (requestedChapter as LibraryChapterSlug)
+    : "nutrition";
+
+  const [activeChapter, setActiveChapter] = useState<LibraryChapterSlug>(initialChapter);
+
+  function handleJump(id: string) {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // Deep-link support (e.g. a link from the Workout page): jump to the
+  // requested section once its chapter has rendered.
+  useEffect(() => {
+    const section = searchParams.get("section");
+    if (!section) return;
+    const timer = setTimeout(() => handleJump(section), 150);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-run when the chapter we jump within changes
+  }, [activeChapter]);
 
   function handleChapterChange(slug: LibraryChapterSlug) {
     setActiveChapter(slug);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function handleJump(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   return (

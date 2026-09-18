@@ -2,12 +2,10 @@
 
 import { useState, useTransition } from "react";
 import { Plus, Trash2 } from "lucide-react";
-import {
-  MOVEMENT_PATTERNS,
-  type MovementPatternSlug,
-  type MovementVariant,
-} from "@/lib/data/movement";
+import { MOVEMENT_PATTERNS, type MovementVariant } from "@/lib/data/movement";
 import { logWorkoutSession, type SetInput } from "@/app/actions/workout";
+import { ExercisePicker, type PickedExercise } from "@/components/exercise-picker";
+import { VideoLink } from "@/components/video-link";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
 import { getWorkoutCelebration } from "@/lib/encouragement";
@@ -22,78 +20,114 @@ const HARDER_MARKERS = [
 
 type SetRow = { reps: string; weightKg: string };
 
-type PatternEntry = {
-  variant: MovementVariant;
+type SessionEntry = {
+  id: string;
   exerciseName: string;
+  patternSlug: string | null;
+  bundleId: string | null;
+  variant: MovementVariant | null;
+  isBookExercise: boolean;
   bodyweightLevel: 1 | 2 | 3 | null;
   harderVariantMarkers: string[];
   sets: SetRow[];
 };
 
-export function WorkoutSessionForm() {
+type Bundle = { id: string; name: string };
+type CustomExercise = {
+  id: string;
+  name: string;
+  patternSlug: string | null;
+  bundleId: string | null;
+  variant: MovementVariant | null;
+};
+
+export function WorkoutSessionForm({
+  bundles,
+  customExercises,
+}: {
+  bundles: Bundle[];
+  customExercises: CustomExercise[];
+}) {
   const [sessionDate, setSessionDate] = useState(todayISO());
-  const [entries, setEntries] = useState<Partial<Record<MovementPatternSlug, PatternEntry>>>({});
+  const [entries, setEntries] = useState<SessionEntry[]>([]);
+  const [addingExercise, setAddingExercise] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [justLogged, setJustLogged] = useState(false);
 
-  function togglePattern(slug: MovementPatternSlug) {
-    setEntries((prev) => {
-      const next = { ...prev };
-      if (next[slug]) {
-        delete next[slug];
-      } else {
-        const pattern = MOVEMENT_PATTERNS.find((p) => p.slug === slug)!;
-        next[slug] = {
-          variant: "bodyweight",
-          exerciseName: pattern.exercises.bodyweight[0] ?? "",
-          bodyweightLevel: null,
-          harderVariantMarkers: [],
-          sets: [{ reps: "10", weightKg: "" }],
-        };
-      }
-      return next;
-    });
+  function addEntry(picked: PickedExercise) {
+    setEntries((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        exerciseName: picked.exerciseName,
+        patternSlug: picked.patternSlug,
+        bundleId: picked.bundleId,
+        variant: picked.variant ?? "bodyweight",
+        isBookExercise: picked.isBookExercise,
+        bodyweightLevel: null,
+        harderVariantMarkers: [],
+        sets: [{ reps: "10", weightKg: "" }],
+      },
+    ]);
+    setAddingExercise(false);
   }
 
-  function updateEntry(slug: MovementPatternSlug, patch: Partial<PatternEntry>) {
-    setEntries((prev) => ({ ...prev, [slug]: { ...prev[slug]!, ...patch } }));
+  function updateEntry(id: string, patch: Partial<SessionEntry>) {
+    setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)));
   }
 
-  function addSet(slug: MovementPatternSlug) {
-    const entry = entries[slug]!;
-    updateEntry(slug, { sets: [...entry.sets, { reps: "10", weightKg: "" }] });
+  function removeEntry(id: string) {
+    setEntries((prev) => prev.filter((e) => e.id !== id));
   }
 
-  function removeSet(slug: MovementPatternSlug, index: number) {
-    const entry = entries[slug]!;
-    updateEntry(slug, { sets: entry.sets.filter((_, i) => i !== index) });
+  function addSet(id: string) {
+    setEntries((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, sets: [...e.sets, { reps: "10", weightKg: "" }] } : e)),
+    );
   }
 
-  function updateSet(slug: MovementPatternSlug, index: number, patch: Partial<SetRow>) {
-    const entry = entries[slug]!;
-    const sets = entry.sets.map((s, i) => (i === index ? { ...s, ...patch } : s));
-    updateEntry(slug, { sets });
+  function removeSet(id: string, index: number) {
+    setEntries((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, sets: e.sets.filter((_, i) => i !== index) } : e)),
+    );
   }
 
-  function toggleMarker(slug: MovementPatternSlug, markerKey: string) {
-    const entry = entries[slug]!;
-    const has = entry.harderVariantMarkers.includes(markerKey);
-    updateEntry(slug, {
-      harderVariantMarkers: has
-        ? entry.harderVariantMarkers.filter((m) => m !== markerKey)
-        : [...entry.harderVariantMarkers, markerKey],
-    });
+  function updateSet(id: string, index: number, patch: Partial<SetRow>) {
+    setEntries((prev) =>
+      prev.map((e) =>
+        e.id === id ? { ...e, sets: e.sets.map((s, i) => (i === index ? { ...s, ...patch } : s)) } : e,
+      ),
+    );
+  }
+
+  function toggleMarker(id: string, markerKey: string) {
+    setEntries((prev) =>
+      prev.map((e) =>
+        e.id === id
+          ? {
+              ...e,
+              harderVariantMarkers: e.harderVariantMarkers.includes(markerKey)
+                ? e.harderVariantMarkers.filter((m) => m !== markerKey)
+                : [...e.harderVariantMarkers, markerKey],
+            }
+          : e,
+      ),
+    );
   }
 
   function handleSubmit() {
-    const patternsTrained = Object.keys(entries);
-    if (patternsTrained.length === 0) return;
+    if (entries.length === 0) return;
+
+    const patternsTrained = Array.from(
+      new Set(entries.map((e) => e.patternSlug).filter((p): p is string => Boolean(p))),
+    );
 
     const sets: SetInput[] = [];
-    for (const [slug, entry] of Object.entries(entries) as [MovementPatternSlug, PatternEntry][]) {
+    for (const entry of entries) {
       entry.sets.forEach((s, i) => {
         sets.push({
-          patternSlug: slug,
+          patternSlug: entry.patternSlug,
+          bundleId: entry.bundleId,
           exerciseName: entry.exerciseName,
           variant: entry.variant,
           setNumber: i + 1,
@@ -108,7 +142,7 @@ export function WorkoutSessionForm() {
 
     startTransition(async () => {
       await logWorkoutSession({ sessionDate, patternsTrained, notes: null, sets });
-      setEntries({});
+      setEntries([]);
       setJustLogged(true);
       setTimeout(() => setJustLogged(false), 2500);
     });
@@ -127,72 +161,51 @@ export function WorkoutSessionForm() {
         />
       </div>
 
-      <div>
-        <p className="mb-2 text-sm font-medium text-ink-soft">
-          Which movement patterns did you train?
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {MOVEMENT_PATTERNS.map((pattern) => {
-            const active = Boolean(entries[pattern.slug]);
-            return (
-              <button
-                key={pattern.slug}
-                onClick={() => togglePattern(pattern.slug)}
-                className={cn(
-                  "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors",
-                  active
-                    ? "border-terracotta bg-terracotta text-white"
-                    : "border-border bg-surface-soft text-ink-soft hover:border-terracotta/40",
-                )}
-              >
-                {pattern.name}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {(Object.entries(entries) as [MovementPatternSlug, PatternEntry][]).map(([slug, entry]) => {
-        const pattern = MOVEMENT_PATTERNS.find((p) => p.slug === slug)!;
-        const exerciseOptions = pattern.exercises[entry.variant];
+      {entries.map((entry) => {
+        const pattern = entry.patternSlug
+          ? MOVEMENT_PATTERNS.find((p) => p.slug === entry.patternSlug)
+          : null;
 
         return (
-          <div key={slug} className="rounded-2xl border border-border bg-surface-soft p-4">
-            <p className="mb-3 font-serif-display text-base text-ink">{pattern.name}</p>
-
-            <div className="mb-3 flex flex-wrap gap-2">
-              {(["gym", "home-weights", "bodyweight"] as MovementVariant[]).map((variant) => (
+          <div key={entry.id} className="rounded-2xl border border-border bg-surface-soft p-4">
+            <div className="mb-3 flex items-start justify-between gap-2">
+              <div>
+                <p className="font-serif-display text-base text-ink">{entry.exerciseName}</p>
+                <p className="text-xs text-ink-faint">{pattern?.name ?? "Your own exercise"}</p>
+              </div>
+              <div className="flex items-center gap-1">
+                <VideoLink exerciseName={entry.exerciseName} />
                 <button
-                  key={variant}
-                  onClick={() =>
-                    updateEntry(slug, {
-                      variant,
-                      exerciseName: pattern.exercises[variant][0] ?? "",
-                    })
-                  }
-                  className={cn(
-                    "rounded-full px-3 py-1 text-xs font-medium transition-colors",
-                    entry.variant === variant
-                      ? "bg-ink text-cream"
-                      : "bg-cream-soft text-ink-soft",
-                  )}
+                  onClick={() => removeEntry(entry.id)}
+                  aria-label={`Remove ${entry.exerciseName}`}
+                  className="flex h-11 w-11 items-center justify-center text-ink-faint hover:text-terracotta-deep"
                 >
-                  {variant === "gym" ? "Gym" : variant === "home-weights" ? "Home + weights" : "Bodyweight"}
+                  <Trash2 size={16} />
                 </button>
-              ))}
+              </div>
             </div>
 
-            <select
-              value={entry.exerciseName}
-              onChange={(e) => updateEntry(slug, { exerciseName: e.target.value })}
-              className="mb-3 w-full rounded-2xl border border-border bg-surface px-4 py-2.5 text-sm text-ink"
-            >
-              {exerciseOptions.map((ex) => (
-                <option key={ex} value={ex}>
-                  {ex}
-                </option>
-              ))}
-            </select>
+            {entry.isBookExercise && pattern && (
+              <div className="mb-3 flex flex-wrap gap-2">
+                {(["gym", "home-weights", "bodyweight"] as MovementVariant[]).map((variant) => (
+                  <button
+                    key={variant}
+                    onClick={() =>
+                      updateEntry(entry.id, {
+                        variant,
+                        exerciseName: pattern.exercises[variant][0] ?? entry.exerciseName,
+                      })
+                    }
+                    className={cn(
+                      "rounded-full px-3 py-1 text-xs font-medium transition-colors",
+                      entry.variant === variant ? "bg-ink text-cream" : "bg-cream-soft text-ink-soft",
+                    )}
+                  >
+                    {variant === "gym" ? "Gym" : variant === "home-weights" ? "Home + weights" : "Bodyweight"}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {entry.variant === "bodyweight" && (
               <div className="mb-3 space-y-2">
@@ -202,7 +215,7 @@ export function WorkoutSessionForm() {
                     <button
                       key={lvl}
                       onClick={() =>
-                        updateEntry(slug, {
+                        updateEntry(entry.id, {
                           bodyweightLevel: entry.bodyweightLevel === lvl ? null : (lvl as 1 | 2 | 3),
                         })
                       }
@@ -221,7 +234,7 @@ export function WorkoutSessionForm() {
                   {HARDER_MARKERS.map((marker) => (
                     <button
                       key={marker.key}
-                      onClick={() => toggleMarker(slug, marker.key)}
+                      onClick={() => toggleMarker(entry.id, marker.key)}
                       className={cn(
                         "rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors",
                         entry.harderVariantMarkers.includes(marker.key)
@@ -244,18 +257,18 @@ export function WorkoutSessionForm() {
                     type="number"
                     placeholder="Reps"
                     value={set.reps}
-                    onChange={(e) => updateSet(slug, i, { reps: e.target.value })}
+                    onChange={(e) => updateSet(entry.id, i, { reps: e.target.value })}
                     className="w-20"
                   />
                   <Input
                     type="number"
                     placeholder={entry.variant === "bodyweight" ? "kg (optional)" : "kg"}
                     value={set.weightKg}
-                    onChange={(e) => updateSet(slug, i, { weightKg: e.target.value })}
+                    onChange={(e) => updateSet(entry.id, i, { weightKg: e.target.value })}
                     className="w-28"
                   />
                   <button
-                    onClick={() => removeSet(slug, i)}
+                    onClick={() => removeSet(entry.id, i)}
                     className="text-ink-faint hover:text-terracotta-deep"
                     aria-label="Remove set"
                   >
@@ -264,7 +277,7 @@ export function WorkoutSessionForm() {
                 </div>
               ))}
               <button
-                onClick={() => addSet(slug)}
+                onClick={() => addSet(entry.id)}
                 className="flex items-center gap-1 text-xs font-semibold text-terracotta-deep"
               >
                 <Plus size={14} /> Add set
@@ -274,7 +287,27 @@ export function WorkoutSessionForm() {
         );
       })}
 
-      <Button onClick={handleSubmit} disabled={isPending || Object.keys(entries).length === 0}>
+      {addingExercise ? (
+        <div className="rounded-2xl border border-dashed border-border p-3">
+          <p className="mb-2 text-sm font-medium text-ink-soft">Which exercise?</p>
+          <ExercisePicker customExercises={customExercises} bundles={bundles} onSelect={addEntry} />
+          <button
+            onClick={() => setAddingExercise(false)}
+            className="mt-2 text-xs font-semibold text-ink-faint"
+          >
+            Close
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={() => setAddingExercise(true)}
+          className="flex min-h-11 items-center gap-1.5 text-sm font-semibold text-terracotta-deep"
+        >
+          <Plus size={16} /> Add an exercise
+        </button>
+      )}
+
+      <Button onClick={handleSubmit} disabled={isPending || entries.length === 0}>
         {isPending ? "Logging…" : "Log this session"}
       </Button>
 

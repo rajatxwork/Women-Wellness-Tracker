@@ -15,6 +15,8 @@ create table if not exists public.profiles (
   last_period_start date,
   water_goal_ml int not null default 2000,
   age_band text check (age_band in ('20s-30s', '30s-50s', '60-plus')),
+  training_level text check (training_level in ('beginner', 'intermediate', 'advanced')),
+  workout_goal_slugs text[] not null default '{}',
   onboarded boolean not null default false,
   terms_accepted_at timestamptz,
   created_at timestamptz not null default now(),
@@ -330,6 +332,7 @@ create table if not exists public.program_items (
   bundle_id uuid references public.exercise_bundles (id) on delete set null,
   exercise_name text not null,
   variant text check (variant in ('gym', 'home-weights', 'bodyweight')),
+  day_of_week int check (day_of_week between 1 and 7),
   sort_order int not null default 0,
   created_at timestamptz not null default now()
 );
@@ -342,6 +345,34 @@ create policy "program_items are owner-scoped insert" on public.program_items
   for insert with check (auth.uid() = user_id);
 create policy "program_items are owner-scoped delete" on public.program_items
   for delete using (auth.uid() = user_id);
+
+-- Plan days: the type of each weekday (1 = Monday ... 7 = Sunday) in a
+-- user's own editable weekly plan, shown on the Workout page.
+create table if not exists public.plan_days (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  day_of_week int not null check (day_of_week between 1 and 7),
+  day_type text not null check (day_type in ('strength', 'cardio', 'recovery', 'rest')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (user_id, day_of_week)
+);
+
+alter table public.plan_days enable row level security;
+
+create policy "plan_days are owner-scoped select" on public.plan_days
+  for select using (auth.uid() = user_id);
+create policy "plan_days are owner-scoped insert" on public.plan_days
+  for insert with check (auth.uid() = user_id);
+create policy "plan_days are owner-scoped update" on public.plan_days
+  for update using (auth.uid() = user_id);
+create policy "plan_days are owner-scoped delete" on public.plan_days
+  for delete using (auth.uid() = user_id);
+
+drop trigger if exists plan_days_set_updated_at on public.plan_days;
+create trigger plan_days_set_updated_at
+  before update on public.plan_days
+  for each row execute function public.set_updated_at();
 
 create table if not exists public.workout_sessions (
   id uuid primary key default gen_random_uuid(),

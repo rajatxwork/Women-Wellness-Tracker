@@ -1,17 +1,29 @@
-import { startOfWeek, endOfWeek, differenceInCalendarDays, subDays } from "date-fns";
-import { Dumbbell } from "lucide-react";
+import { startOfWeek, endOfWeek, addDays, differenceInCalendarDays, format, subDays } from "date-fns";
+import Link from "next/link";
+import { Dumbbell, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthedUser, getProfile } from "@/lib/supabase/get-user";
 import { formatDateISO } from "@/lib/utils";
-import { MOVEMENT_PATTERNS, BODYWEIGHT_PROGRESSION } from "@/lib/data/movement";
-import type { AgeBand } from "@/lib/data/plyometrics";
+import { BODYWEIGHT_PROGRESSION } from "@/lib/data/movement";
+import { WEEKLY_STRUCTURE } from "@/lib/data/movement";
+import { TRAINING_LEVEL_OPTIONS, type AgeBand, type TrainingLevel } from "@/lib/data/workout-goals";
+import type { DayType } from "@/app/actions/plan-days";
 import { Card } from "@/components/ui/card";
 import { PageHeading } from "@/components/page-heading";
 import { WorkoutSessionForm } from "@/components/workout-session-form";
 import { CardioForm, PlyoForm, RecoveryForm } from "@/components/cardio-plyo-recovery-forms";
-import { WeeklyStructureView } from "@/components/weekly-structure-view";
 import { CustomExerciseManager } from "@/components/custom-exercise-manager";
-import { ProgramSection } from "@/components/program-section";
+import { TrainingGoalSetup } from "@/components/training-goal-setup";
+import { WeeklyPlanBuilder, type DayView, type PlanItemView } from "@/components/weekly-plan-builder";
+
+const DAY_LABELS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+function toDayType(type: (typeof WEEKLY_STRUCTURE)[number]["type"]): DayType {
+  if (type === "recovery") return "recovery";
+  if (type === "rest") return "rest";
+  if (type === "cardio") return "cardio";
+  return "strength";
+}
 
 export default async function WorkoutPage() {
   const user = await getAuthedUser();
@@ -26,8 +38,8 @@ export default async function WorkoutPage() {
     { data: weekSessions },
     { data: bundles },
     { data: customExercises },
-    { data: programs },
     { data: programItems },
+    { data: planDays },
     { data: recentSets },
   ] = await Promise.all([
     getProfile(user.id),
@@ -43,12 +55,12 @@ export default async function WorkoutPage() {
       .select("id, name, pattern_slug, bundle_id, variant")
       .eq("user_id", user.id)
       .order("created_at"),
-    supabase.from("programs").select("id, name").eq("user_id", user.id).order("created_at"),
     supabase
       .from("program_items")
-      .select("id, program_id, exercise_name, pattern_slug, bundle_id, variant, sort_order")
+      .select("id, program_id, exercise_name, pattern_slug, bundle_id, variant, day_of_week, sort_order")
       .eq("user_id", user.id)
       .order("sort_order"),
+    supabase.from("plan_days").select("day_of_week, day_type").eq("user_id", user.id),
     supabase
       .from("workout_sets")
       .select("exercise_name, reps, weight_kg, workout_sessions!inner(session_date)")
@@ -80,20 +92,40 @@ export default async function WorkoutPage() {
     entries.sort((a, b) => b.date.localeCompare(a.date));
   }
 
-  const programViews = (programs ?? []).map((p) => ({
-    id: p.id,
-    name: p.name,
-    items: (programItems ?? [])
-      .filter((it) => it.program_id === p.id)
-      .map((it) => ({
-        id: it.id,
-        exerciseName: it.exercise_name,
-        patternSlug: it.pattern_slug,
-        bundleId: it.bundle_id,
-        variant: it.variant,
-        recentEntries: (entriesByExercise.get(it.exercise_name) ?? []).slice(0, 5),
-      })),
-  }));
+  const dayTypeByDayOfWeek = new Map((planDays ?? []).map((d) => [d.day_of_week, d.day_type as DayType]));
+
+  const itemsByDayOfWeek = new Map<number, PlanItemView[]>();
+  for (const it of programItems ?? []) {
+    if (!it.day_of_week) continue;
+    const view: PlanItemView = {
+      id: it.id,
+      programId: it.program_id,
+      exerciseName: it.exercise_name,
+      patternSlug: it.pattern_slug,
+      bundleId: it.bundle_id,
+      variant: it.variant,
+      isBookExercise: !it.bundle_id && Boolean(it.pattern_slug),
+      recentEntries: (entriesByExercise.get(it.exercise_name) ?? []).slice(0, 5),
+    };
+    if (!itemsByDayOfWeek.has(it.day_of_week)) itemsByDayOfWeek.set(it.day_of_week, []);
+    itemsByDayOfWeek.get(it.day_of_week)!.push(view);
+  }
+
+  const days: DayView[] = WEEKLY_STRUCTURE.map((baseline, i) => {
+    const dayOfWeek = i + 1;
+    return {
+      dayOfWeek,
+      label: DAY_LABELS[i],
+      dateLabel: format(addDays(weekStart, i), "MMM d"),
+      dayType: dayTypeByDayOfWeek.get(dayOfWeek) ?? toDayType(baseline.type),
+      done: completedByDayIndex[i],
+      items: itemsByDayOfWeek.get(dayOfWeek) ?? [],
+    };
+  });
+
+  const defaultVariant =
+    TRAINING_LEVEL_OPTIONS.find((l) => l.value === profile?.training_level)?.defaultVariant ??
+    "bodyweight";
 
   const customExerciseViews = (customExercises ?? []).map((c) => ({
     id: c.id,
@@ -108,99 +140,82 @@ export default async function WorkoutPage() {
       <PageHeading
         icon={Dumbbell}
         title="Movement"
-        subtitle="Full body, three days a week, with room to breathe around it."
+        subtitle="Your goals, your program, built around the book's guidance."
         accentClass="bg-terracotta/15 text-terracotta-deep"
       />
 
       <Card>
-        <h2 className="mb-4 font-serif-display text-lg text-ink">This week</h2>
-        <WeeklyStructureView completedByDayIndex={completedByDayIndex} />
+        <h2 className="mb-1 font-serif-display text-lg text-ink">Your training profile</h2>
+        <p className="mb-4 text-sm text-ink-soft">
+          Tell us where you&apos;re starting from and what you want, and we&apos;ll suggest an ideal
+          week, you can use it as is or build your own.
+        </p>
+        <TrainingGoalSetup
+          initialAgeBand={profile?.age_band as AgeBand | null}
+          initialTrainingLevel={profile?.training_level as TrainingLevel | null}
+          initialGoalSlugs={profile?.workout_goal_slugs ?? []}
+        />
+      </Card>
+
+      <Card>
+        <h2 className="mb-1 font-serif-display text-lg text-ink">This week</h2>
+        <p className="mb-4 text-sm text-ink-soft">
+          Set each day&apos;s type, then add whatever movements you want to it, this is your program.
+        </p>
+        <WeeklyPlanBuilder
+          days={days}
+          bundles={bundles ?? []}
+          customExercises={customExerciseViews}
+          defaultVariant={defaultVariant}
+        />
       </Card>
 
       <Card>
         <h2 className="mb-4 font-serif-display text-lg text-ink">Log a strength session</h2>
-        <WorkoutSessionForm />
-      </Card>
-
-      <Card>
-        <h2 className="mb-1 font-serif-display text-lg text-ink">Your programs</h2>
-        <p className="mb-4 text-sm text-ink-soft">
-          Build your own plan from whatever movements you choose, then track them here
-          over time.
-        </p>
-        <ProgramSection
-          programs={programViews}
-          bundles={bundles ?? []}
-          customExercises={customExerciseViews}
-        />
+        <WorkoutSessionForm bundles={bundles ?? []} customExercises={customExerciseViews} />
       </Card>
 
       <Card>
         <h2 className="mb-1 font-serif-display text-lg text-ink">Your own exercises</h2>
         <p className="mb-4 text-sm text-ink-soft">
           Not everything fits the book&apos;s 8 patterns. Add your own and bundle them
-          however makes sense to you.
+          however makes sense to you, you can also add one straight from logging a session.
         </p>
         <CustomExerciseManager bundles={bundles ?? []} customExercises={customExerciseViews} />
       </Card>
 
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div id="cardio-log" className="grid gap-6 sm:grid-cols-2">
         <Card>
           <h2 className="mb-4 font-serif-display text-lg text-ink">Cardio</h2>
           <CardioForm />
         </Card>
         <Card>
           <h2 className="mb-4 font-serif-display text-lg text-ink">Plyometrics</h2>
-          <PlyoForm defaultAgeBand={(profile?.age_band as AgeBand) ?? "20s-30s"} />
+          <PlyoForm ageBand={profile?.age_band as AgeBand | null} />
         </Card>
       </div>
 
-      <Card>
-        <h2 className="mb-4 font-serif-display text-lg text-ink">Rest day or active recovery</h2>
-        <RecoveryForm />
-      </Card>
-
-      <div className="space-y-4">
-        <h2 className="font-serif-display text-lg text-ink">Movement pattern library</h2>
-        {MOVEMENT_PATTERNS.map((pattern) => (
-          <Card key={pattern.slug}>
-            <h3 className="font-serif-display text-base text-ink">
-              {pattern.name}
-              {pattern.priority && (
-                <span className="ml-2 rounded-full bg-terracotta/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-terracotta-deep">
-                  Priority
-                </span>
-              )}
-            </h3>
-            <div className="mt-3 grid gap-3 sm:grid-cols-3">
-              <div>
-                <p className="mb-1 text-xs font-semibold text-ink-faint">Gym</p>
-                <ul className="space-y-1 text-sm text-ink-soft">
-                  {pattern.exercises.gym.map((e) => (
-                    <li key={e}>{e}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <p className="mb-1 text-xs font-semibold text-ink-faint">Home + weights</p>
-                <ul className="space-y-1 text-sm text-ink-soft">
-                  {pattern.exercises["home-weights"].map((e) => (
-                    <li key={e}>{e}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <p className="mb-1 text-xs font-semibold text-ink-faint">Bodyweight</p>
-                <ul className="space-y-1 text-sm text-ink-soft">
-                  {pattern.exercises.bodyweight.map((e) => (
-                    <li key={e}>{e}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </Card>
-        ))}
+      <div id="recovery-log">
+        <Card>
+          <h2 className="mb-4 font-serif-display text-lg text-ink">Rest day or active recovery</h2>
+          <RecoveryForm />
+        </Card>
       </div>
+
+      <Card className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="font-serif-display text-lg text-ink">Movement pattern library</h2>
+          <p className="mt-1 text-sm text-ink-soft">
+            Every pattern, every variant, with form videos, over in the Library.
+          </p>
+        </div>
+        <Link
+          href="/library?chapter=strength&section=strength-patterns"
+          className="flex items-center gap-1.5 rounded-full bg-terracotta px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-terracotta-deep"
+        >
+          Open Library <ArrowRight size={15} />
+        </Link>
+      </Card>
 
       <Card>
         <h2 className="mb-4 font-serif-display text-lg text-ink">Bodyweight progression</h2>

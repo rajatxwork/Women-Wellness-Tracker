@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { BODYWEIGHT_PROGRESSION, type BodyweightLevel } from "@/lib/data/movement";
 import { PillTabs } from "@/components/ui/pill-tabs";
-import { VideoLink } from "@/components/library/video-link";
+import { VideoLink } from "@/components/video-link";
 
 const LEVEL_OPTIONS: { value: string; label: string }[] = [
   { value: "1", label: "Level 1" },

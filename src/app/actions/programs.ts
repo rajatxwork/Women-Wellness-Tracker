@@ -4,48 +4,40 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { todayISO } from "@/lib/utils";
 
-export async function createProgram(name: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not signed in");
-
-  const { data, error } = await supabase
+// The Workout page now has exactly one implicit weekly program per user
+// (the editable "This week" builder) rather than a list of named programs a
+// user manages directly. This finds that program, creating it on first use.
+async function getOrCreateWeekProgram(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+) {
+  const { data: existing } = await supabase
     .from("programs")
-    .insert({ user_id: user.id, name })
-    .select()
+    .select("id")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (existing) return existing.id as string;
+
+  const { data: created, error } = await supabase
+    .from("programs")
+    .insert({ user_id: userId, name: "My Week" })
+    .select("id")
     .single();
   if (error) throw error;
-
-  revalidatePath("/workout");
-  return data;
+  return created.id as string;
 }
 
-export async function deleteProgram(programId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not signed in");
-
-  const { error } = await supabase
-    .from("programs")
-    .delete()
-    .eq("id", programId)
-    .eq("user_id", user.id);
-  if (error) throw error;
-
-  revalidatePath("/workout");
-}
-
-export async function addProgramItem(input: {
-  programId: string;
+// Adds a movement directly to a day in the user's week, creating her one
+// implicit program on first use so the caller never has to think about
+// program ids.
+export async function addWeekMovement(input: {
+  dayOfWeek: number;
   exerciseName: string;
   patternSlug: string | null;
   bundleId: string | null;
   variant: "gym" | "home-weights" | "bodyweight" | null;
-  sortOrder: number;
 }) {
   const supabase = await createClient();
   const {
@@ -53,14 +45,23 @@ export async function addProgramItem(input: {
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Not signed in");
 
+  const programId = await getOrCreateWeekProgram(supabase, user.id);
+
+  const { count } = await supabase
+    .from("program_items")
+    .select("id", { count: "exact", head: true })
+    .eq("program_id", programId)
+    .eq("day_of_week", input.dayOfWeek);
+
   const { error } = await supabase.from("program_items").insert({
-    program_id: input.programId,
+    program_id: programId,
     user_id: user.id,
     exercise_name: input.exerciseName,
     pattern_slug: input.patternSlug,
     bundle_id: input.bundleId,
     variant: input.variant,
-    sort_order: input.sortOrder,
+    day_of_week: input.dayOfWeek,
+    sort_order: count ?? 0,
   });
   if (error) throw error;
 

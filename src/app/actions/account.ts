@@ -24,6 +24,7 @@ const USER_SCOPED_TABLES = [
   "custom_exercises",
   "programs",
   "program_items",
+  "plan_days",
   "workout_sessions",
   "workout_sets",
   "cardio_logs",

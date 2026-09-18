@@ -5,7 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { todayISO } from "@/lib/utils";
 
 export type SetInput = {
-  patternSlug: string;
+  patternSlug: string | null;
+  bundleId: string | null;
   exerciseName: string;
   variant: "gym" | "home-weights" | "bodyweight" | null;
   setNumber: number;
@@ -47,6 +48,7 @@ export async function logWorkoutSession(input: {
         session_id: session.id,
         user_id: user.id,
         pattern_slug: s.patternSlug,
+        bundle_id: s.bundleId,
         exercise_name: s.exerciseName,
         variant: s.variant,
         set_number: s.setNumber,

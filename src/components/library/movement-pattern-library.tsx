@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { MOVEMENT_PATTERNS, type MovementVariant } from "@/lib/data/movement";
 import { PillTabs } from "@/components/ui/pill-tabs";
-import { VideoLink } from "@/components/library/video-link";
+import { VideoLink } from "@/components/video-link";
 
 const ENV_OPTIONS: { value: MovementVariant; label: string }[] = [
   { value: "gym", label: "Gym" },

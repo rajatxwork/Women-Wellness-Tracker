@@ -5,6 +5,8 @@ export type Profile = {
   last_period_start: string | null;
   water_goal_ml: number;
   age_band: "20s-30s" | "30s-50s" | "60-plus" | null;
+  training_level: "beginner" | "intermediate" | "advanced" | null;
+  workout_goal_slugs: string[];
   onboarded: boolean;
   terms_accepted_at: string | null;
   created_at: string;
@@ -143,8 +145,18 @@ export type ProgramItem = {
   bundle_id: string | null;
   exercise_name: string;
   variant: "gym" | "home-weights" | "bodyweight" | null;
+  day_of_week: number | null;
   sort_order: number;
   created_at: string;
+};
+
+export type PlanDay = {
+  id: string;
+  user_id: string;
+  day_of_week: number;
+  day_type: "strength" | "cardio" | "recovery" | "rest";
+  created_at: string;
+  updated_at: string;
 };
 
 export type CardioLog = {
