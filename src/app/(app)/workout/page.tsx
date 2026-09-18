@@ -4,7 +4,6 @@ import { Dumbbell, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthedUser, getProfile } from "@/lib/supabase/get-user";
 import { formatDateISO } from "@/lib/utils";
-import { BODYWEIGHT_PROGRESSION } from "@/lib/data/movement";
 import { WEEKLY_STRUCTURE } from "@/lib/data/movement";
 import { TRAINING_LEVEL_OPTIONS, type AgeBand, type TrainingLevel } from "@/lib/data/workout-goals";
 import type { DayType } from "@/app/actions/plan-days";
@@ -206,7 +205,8 @@ export default async function WorkoutPage() {
         <div>
           <h2 className="font-serif-display text-lg text-ink">Movement pattern library</h2>
           <p className="mt-1 text-sm text-ink-soft">
-            Every pattern, every variant, with form videos, over in the Library.
+            Every pattern, every variant, and the bodyweight progressions, with form videos, over in
+            the Library.
           </p>
         </div>
         <Link
@@ -215,29 +215,6 @@ export default async function WorkoutPage() {
         >
           Open Library <ArrowRight size={15} />
         </Link>
-      </Card>
-
-      <Card>
-        <h2 className="mb-4 font-serif-display text-lg text-ink">Bodyweight progression</h2>
-        <div className="space-y-4">
-          {([1, 2, 3] as const).map((level) => (
-            <div key={level}>
-              <p className="mb-2 text-sm font-semibold text-ink">
-                {BODYWEIGHT_PROGRESSION[level].label}
-              </p>
-              <ul className="flex flex-wrap gap-1.5">
-                {BODYWEIGHT_PROGRESSION[level].exercises.map((ex) => (
-                  <li
-                    key={ex.exercise}
-                    className="rounded-full bg-cream-soft px-3 py-1 text-xs text-ink-soft"
-                  >
-                    {ex.exercise}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
       </Card>
     </div>
   );
