@@ -4,9 +4,13 @@ import { Dumbbell, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthedUser, getProfile } from "@/lib/supabase/get-user";
 import { formatDateISO } from "@/lib/utils";
-import { WEEKLY_STRUCTURE } from "@/lib/data/movement";
-import { TRAINING_LEVEL_OPTIONS, type AgeBand, type TrainingLevel } from "@/lib/data/workout-goals";
-import type { DayType } from "@/app/actions/plan-days";
+import {
+  TRAINING_LEVEL_OPTIONS,
+  baselineDayType,
+  type AgeBand,
+  type DayType,
+  type TrainingLevel,
+} from "@/lib/data/workout-goals";
 import { Card } from "@/components/ui/card";
 import { PageHeading } from "@/components/page-heading";
 import { WorkoutSessionForm } from "@/components/workout-session-form";
@@ -17,13 +21,6 @@ import { DynamicStretchLinks } from "@/components/dynamic-stretch-links";
 import { WeeklyPlanBuilder, type DayView, type PlanItemView } from "@/components/weekly-plan-builder";
 
 const DAY_LABELS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-function toDayType(type: (typeof WEEKLY_STRUCTURE)[number]["type"]): DayType {
-  if (type === "recovery") return "recovery";
-  if (type === "rest") return "rest";
-  if (type === "cardio") return "cardio";
-  return "strength";
-}
 
 export default async function WorkoutPage() {
   const user = await getAuthedUser();
@@ -111,13 +108,13 @@ export default async function WorkoutPage() {
     itemsByDayOfWeek.get(it.day_of_week)!.push(view);
   }
 
-  const days: DayView[] = WEEKLY_STRUCTURE.map((baseline, i) => {
+  const days: DayView[] = DAY_LABELS.map((_, i) => {
     const dayOfWeek = i + 1;
     return {
       dayOfWeek,
       label: DAY_LABELS[i],
       dateLabel: format(addDays(weekStart, i), "MMM d"),
-      dayType: dayTypeByDayOfWeek.get(dayOfWeek) ?? toDayType(baseline.type),
+      dayType: dayTypeByDayOfWeek.get(dayOfWeek) ?? baselineDayType(dayOfWeek),
       done: completedByDayIndex[i],
       items: itemsByDayOfWeek.get(dayOfWeek) ?? [],
     };
@@ -157,21 +154,24 @@ export default async function WorkoutPage() {
         />
       </Card>
 
-      <Card>
-        <h2 className="mb-1 font-serif-display text-lg text-ink">This week</h2>
-        <p className="mb-4 text-sm text-ink-soft">
-          Set each day&apos;s type, then add whatever movements you want to it, this is your program.
-        </p>
-        <div className="mb-4">
-          <DynamicStretchLinks />
-        </div>
-        <WeeklyPlanBuilder
-          days={days}
-          bundles={bundles ?? []}
-          customExercises={customExerciseViews}
-          defaultVariant={defaultVariant}
-        />
-      </Card>
+      <div id="this-week" className="scroll-mt-20">
+        <Card>
+          <h2 className="mb-1 font-serif-display text-lg text-ink">This week</h2>
+          <p className="mb-4 text-sm text-ink-soft">
+            Set each day&apos;s type, then add whatever movements you want to it, this is your
+            program.
+          </p>
+          <div className="mb-4">
+            <DynamicStretchLinks />
+          </div>
+          <WeeklyPlanBuilder
+            days={days}
+            bundles={bundles ?? []}
+            customExercises={customExerciseViews}
+            defaultVariant={defaultVariant}
+          />
+        </Card>
+      </div>
 
       <Card>
         <h2 className="mb-4 font-serif-display text-lg text-ink">Log a strength session</h2>

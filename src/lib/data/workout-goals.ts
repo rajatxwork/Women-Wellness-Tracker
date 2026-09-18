@@ -1,13 +1,29 @@
 // Goal-first intake for the Workout page. Each goal maps to a concrete,
 // opinionated weekly template (which days, what kind, what body focus, what
 // rep range), so picking one gives a real program, not just a vibe.
-import { MOVEMENT_PATTERNS, type MovementVariant, type BodyweightLevel } from "@/lib/data/movement";
+import { MOVEMENT_PATTERNS, WEEKLY_STRUCTURE, type MovementVariant, type BodyweightLevel } from "@/lib/data/movement";
 import type { PlanDay } from "@/lib/types";
 
 export type AgeBand = "20s-30s" | "30s-50s" | "60-plus";
 export type TrainingLevel = "beginner" | "intermediate" | "advanced";
 export type DayType = PlanDay["day_type"];
 export type DayFocus = "full" | "upper" | "lower" | null;
+
+// 1 = Monday ... 7 = Sunday, matching plan_days.day_of_week.
+export function todayDayOfWeek(): number {
+  const jsWeekday = new Date().getDay(); // 0 = Sunday
+  return jsWeekday === 0 ? 7 : jsWeekday;
+}
+
+// The book's own weekly structure, mapped onto the day_type enum plan_days
+// uses, as the fallback for any day the user hasn't customized.
+export function baselineDayType(dayOfWeek: number): DayType {
+  const type = WEEKLY_STRUCTURE[dayOfWeek - 1]?.type;
+  if (type === "recovery") return "recovery";
+  if (type === "rest") return "rest";
+  if (type === "cardio") return "cardio";
+  return "strength";
+}
 
 export const AGE_BAND_OPTIONS: { value: AgeBand; label: string }[] = [
   { value: "20s-30s", label: "20s to 30s" },

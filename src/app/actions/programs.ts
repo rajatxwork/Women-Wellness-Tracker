@@ -204,4 +204,5 @@ export async function logProgramEntry(input: {
 
   revalidatePath("/workout");
   revalidatePath("/progress");
+  revalidatePath("/");
 }
