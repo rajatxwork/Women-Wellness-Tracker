@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { format, subDays, differenceInCalendarDays } from "date-fns";
+import { Dumbbell, Apple } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthedUser, getProfile } from "@/lib/supabase/get-user";
 import { todayISO, formatDateISO } from "@/lib/utils";
 import { computeCycleStatus } from "@/lib/cycle";
 import { CYCLE_PHASES } from "@/lib/data/cycle-phases";
 import { todayDayOfWeek, baselineDayType, type DayType } from "@/lib/data/workout-goals";
-import { getCelebration, getGreeting, getPhaseTip } from "@/lib/encouragement";
+import { getCelebration, getGreeting } from "@/lib/encouragement";
 import { Card } from "@/components/ui/card";
 import { WaterRing } from "@/components/water-ring";
 import { HabitChecklist } from "@/components/habit-checklist";
@@ -160,16 +161,35 @@ export default async function DashboardPage() {
 
       {cycleStatus && (
         <Card className="bg-blush/30">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-terracotta-deep">
-                Day {cycleStatus.dayOfCycle} · {CYCLE_PHASES[cycleStatus.phase].name} phase
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-ink">
-                {getPhaseTip(cycleStatus.phase)}
-              </p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-terracotta-deep">
+            Day {cycleStatus.dayOfCycle} · {CYCLE_PHASES[cycleStatus.phase].name} phase
+          </p>
+
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div className="flex gap-2.5 rounded-2xl bg-surface/60 p-3">
+              <Dumbbell size={16} className="mt-0.5 flex-shrink-0 text-terracotta-deep" />
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-ink-faint">
+                  Train like this
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-ink">
+                  {CYCLE_PHASES[cycleStatus.phase].trainingNote}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2.5 rounded-2xl bg-surface/60 p-3">
+              <Apple size={16} className="mt-0.5 flex-shrink-0 text-sage-deep" />
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-ink-faint">
+                  Eat like this
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-ink">
+                  {CYCLE_PHASES[cycleStatus.phase].nutritionNote}
+                </p>
+              </div>
             </div>
           </div>
+
           <Link
             href="/cycle"
             className="mt-3 inline-block text-xs font-semibold text-terracotta-deep"
