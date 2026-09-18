@@ -2,16 +2,17 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { TrendingUp, TrendingDown, Plus } from "lucide-react";
+import { TrendingUp, TrendingDown, Plus, Trash2 } from "lucide-react";
 import { MOVEMENT_PATTERNS, type MovementVariant } from "@/lib/data/movement";
 import { repGuidanceForPattern } from "@/lib/data/workout-goals";
 import { logProgramEntry } from "@/app/actions/programs";
+import { updateWorkoutSet, deleteWorkoutSet } from "@/app/actions/workout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { VideoLink } from "@/components/video-link";
 import { cn } from "@/lib/utils";
 
-export type SetEntry = { setNumber: number; reps: number | null; weightKg: number | null };
+export type SetEntry = { id: string; setNumber: number; reps: number | null; weightKg: number | null };
 
 export type ExerciseCompare = {
   id: string;
@@ -164,7 +165,6 @@ function ExerciseCompareRow({ exercise }: { exercise: ExerciseCompare }) {
     : null;
 
   const lastFormatted = exercise.lastSession ? formatSets(exercise.lastSession.sets) : null;
-  const todayFormatted = formatSets(exercise.todaySets);
   const guidance = repGuidanceForPattern(exercise.patternSlug);
 
   function handleLog() {
@@ -223,14 +223,15 @@ function ExerciseCompareRow({ exercise }: { exercise: ExerciseCompare }) {
 
         <div className="rounded-xl bg-surface p-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-ink-faint">This session</p>
-          {todayFormatted ? (
-            <ul className="mt-1.5 space-y-1">
-              {todayFormatted.map((line, i) => (
-                <li key={i} className="text-sm text-ink">
-                  Set {i + 1}: {line}
-                </li>
-              ))}
-            </ul>
+          {exercise.todaySets.length > 0 ? (
+            <div className="mt-1.5 space-y-1.5">
+              {exercise.todaySets
+                .slice()
+                .sort((a, b) => a.setNumber - b.setNumber)
+                .map((set) => (
+                  <SetEditBox key={set.id} set={set} />
+                ))}
+            </div>
           ) : (
             <p className="mt-1.5 text-sm text-ink-faint">Nothing logged yet, beat last time above.</p>
           )}
@@ -257,7 +258,7 @@ function ExerciseCompareRow({ exercise }: { exercise: ExerciseCompare }) {
                 "Logged ✓"
               ) : (
                 <span className="flex items-center gap-1">
-                  <Plus size={13} /> Log set
+                  <Plus size={13} /> Add set
                 </span>
               )}
             </Button>
@@ -265,6 +266,84 @@ function ExerciseCompareRow({ exercise }: { exercise: ExerciseCompare }) {
           {errorMessage && <p className="mt-1.5 text-xs text-terracotta-deep">{errorMessage}</p>}
         </div>
       </div>
+    </div>
+  );
+}
+
+function SetEditBox({ set }: { set: SetEntry }) {
+  const [isPending, startTransition] = useTransition();
+  const [reps, setReps] = useState(set.reps !== null ? String(set.reps) : "");
+  const [weight, setWeight] = useState(set.weightKg !== null ? String(set.weightKg) : "");
+  const [saved, setSaved] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const dirty =
+    reps !== (set.reps !== null ? String(set.reps) : "") ||
+    weight !== (set.weightKg !== null ? String(set.weightKg) : "");
+
+  function handleSave() {
+    setErrorMessage(null);
+    startTransition(async () => {
+      try {
+        await updateWorkoutSet({
+          setId: set.id,
+          reps: reps ? Number(reps) : null,
+          weightKg: weight ? Number(weight) : null,
+        });
+        setSaved(true);
+        setTimeout(() => setSaved(false), 1200);
+      } catch {
+        setErrorMessage("Couldn't save that, try again in a moment.");
+      }
+    });
+  }
+
+  function handleDelete() {
+    setErrorMessage(null);
+    startTransition(async () => {
+      try {
+        await deleteWorkoutSet(set.id);
+      } catch {
+        setErrorMessage("Couldn't delete that, try again in a moment.");
+      }
+    });
+  }
+
+  return (
+    <div className="rounded-xl border border-border bg-cream-soft px-2.5 py-2">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold text-ink-faint">Set {set.setNumber}</span>
+        <button
+          onClick={handleDelete}
+          disabled={isPending}
+          aria-label={`Delete set ${set.setNumber}`}
+          className="flex h-11 w-11 flex-shrink-0 items-center justify-center text-ink-faint hover:text-terracotta-deep disabled:opacity-50"
+        >
+          <Trash2 size={14} />
+        </button>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <Input
+          type="number"
+          value={reps}
+          onChange={(e) => setReps(e.target.value)}
+          placeholder="Reps"
+          className="w-16"
+        />
+        <Input
+          type="number"
+          value={weight}
+          onChange={(e) => setWeight(e.target.value)}
+          placeholder="kg"
+          className="w-16"
+        />
+        {dirty && (
+          <Button size="sm" variant="outline" disabled={isPending} onClick={handleSave}>
+            {isPending ? "…" : saved ? "Saved ✓" : "Save"}
+          </Button>
+        )}
+      </div>
+      {errorMessage && <p className="mt-1 text-xs text-terracotta-deep">{errorMessage}</p>}
     </div>
   );
 }

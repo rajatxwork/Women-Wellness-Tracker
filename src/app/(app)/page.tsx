@@ -64,7 +64,7 @@ export default async function DashboardPage() {
       .order("sort_order"),
     supabase
       .from("workout_sets")
-      .select("exercise_name, reps, weight_kg, set_number, workout_sessions!inner(session_date)")
+      .select("id, exercise_name, reps, weight_kg, set_number, workout_sessions!inner(session_date)")
       .eq("user_id", user.id)
       .gte("workout_sessions.session_date", formatDateISO(subDays(new Date(), 90))),
   ]);
@@ -104,7 +104,7 @@ export default async function DashboardPage() {
     if (!setsByExerciseAndDate.has(s.exercise_name)) setsByExerciseAndDate.set(s.exercise_name, new Map());
     const byDate = setsByExerciseAndDate.get(s.exercise_name)!;
     if (!byDate.has(date)) byDate.set(date, []);
-    byDate.get(date)!.push({ setNumber: s.set_number, reps: s.reps, weightKg: s.weight_kg });
+    byDate.get(date)!.push({ id: s.id, setNumber: s.set_number, reps: s.reps, weightKg: s.weight_kg });
 
     if (s.weight_kg) {
       const diffDays = differenceInCalendarDays(new Date(today + "T00:00:00"), new Date(date + "T00:00:00"));

@@ -67,6 +67,44 @@ export async function logWorkoutSession(input: {
   revalidatePath("/progress");
 }
 
+export async function updateWorkoutSet(input: {
+  setId: string;
+  reps: number | null;
+  weightKg: number | null;
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not signed in");
+
+  const { error } = await supabase
+    .from("workout_sets")
+    .update({ reps: input.reps, weight_kg: input.weightKg })
+    .eq("id", input.setId)
+    .eq("user_id", user.id);
+  if (error) throw error;
+
+  revalidatePath("/workout");
+  revalidatePath("/");
+  revalidatePath("/progress");
+}
+
+export async function deleteWorkoutSet(setId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not signed in");
+
+  const { error } = await supabase.from("workout_sets").delete().eq("id", setId).eq("user_id", user.id);
+  if (error) throw error;
+
+  revalidatePath("/workout");
+  revalidatePath("/");
+  revalidatePath("/progress");
+}
+
 export async function logCardio(input: {
   logDate?: string;
   cardioType: "zone2" | "hiit";
