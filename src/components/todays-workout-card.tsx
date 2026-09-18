@@ -156,6 +156,7 @@ function ExerciseCompareRow({ exercise }: { exercise: ExerciseCompare }) {
   const [reps, setReps] = useState("10");
   const [weight, setWeight] = useState("");
   const [justLogged, setJustLogged] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const pattern = exercise.patternSlug
     ? MOVEMENT_PATTERNS.find((p) => p.slug === exercise.patternSlug)
@@ -165,18 +166,23 @@ function ExerciseCompareRow({ exercise }: { exercise: ExerciseCompare }) {
   const todayFormatted = formatSets(exercise.todaySets);
 
   function handleLog() {
+    setErrorMessage(null);
     startTransition(async () => {
-      await logProgramEntry({
-        programId: exercise.programId,
-        patternSlug: exercise.patternSlug,
-        bundleId: exercise.bundleId,
-        exerciseName: exercise.exerciseName,
-        variant: exercise.variant,
-        reps: reps ? Number(reps) : null,
-        weightKg: weight ? Number(weight) : null,
-      });
-      setJustLogged(true);
-      setTimeout(() => setJustLogged(false), 1500);
+      try {
+        await logProgramEntry({
+          programId: exercise.programId,
+          patternSlug: exercise.patternSlug,
+          bundleId: exercise.bundleId,
+          exerciseName: exercise.exerciseName,
+          variant: exercise.variant,
+          reps: reps ? Number(reps) : null,
+          weightKg: weight ? Number(weight) : null,
+        });
+        setJustLogged(true);
+        setTimeout(() => setJustLogged(false), 1500);
+      } catch {
+        setErrorMessage("Couldn't log that, try again in a moment.");
+      }
     });
   }
 
@@ -249,6 +255,7 @@ function ExerciseCompareRow({ exercise }: { exercise: ExerciseCompare }) {
               )}
             </Button>
           </div>
+          {errorMessage && <p className="mt-1.5 text-xs text-terracotta-deep">{errorMessage}</p>}
         </div>
       </div>
     </div>

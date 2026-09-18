@@ -89,40 +89,58 @@ function DayCard({
 }) {
   const [isPending, startTransition] = useTransition();
   const [addingMovement, setAddingMovement] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const presentPatterns = new Set(day.items.map((i) => i.patternSlug).filter(Boolean));
   const suggestedPatternSlugs = PRIORITY_PATTERN_SLUGS.filter((slug) => !presentPatterns.has(slug));
   const dayVariant = day.items.find((i) => i.variant)?.variant ?? defaultVariant;
 
   function handleTypeChange(newType: DayType) {
-    startTransition(() => setPlanDayType(day.dayOfWeek, newType));
+    setErrorMessage(null);
+    startTransition(async () => {
+      try {
+        await setPlanDayType(day.dayOfWeek, newType);
+      } catch {
+        setErrorMessage("Couldn't save that, try again in a moment.");
+      }
+    });
   }
 
   function handlePick(picked: PickedExercise) {
-    startTransition(() =>
-      addWeekMovement({
-        dayOfWeek: day.dayOfWeek,
-        exerciseName: picked.exerciseName,
-        patternSlug: picked.patternSlug,
-        bundleId: picked.bundleId,
-        variant: picked.variant,
-      }),
-    );
+    setErrorMessage(null);
+    startTransition(async () => {
+      try {
+        await addWeekMovement({
+          dayOfWeek: day.dayOfWeek,
+          exerciseName: picked.exerciseName,
+          patternSlug: picked.patternSlug,
+          bundleId: picked.bundleId,
+          variant: picked.variant,
+        });
+      } catch {
+        setErrorMessage("Couldn't add that movement, try again in a moment.");
+      }
+    });
     setAddingMovement(false);
   }
 
   function handleQuickAddPattern(slug: string) {
     const pattern = MOVEMENT_PATTERNS.find((p) => p.slug === slug)!;
     const exerciseName = pattern.exercises[dayVariant]?.[0] ?? pattern.exercises.bodyweight[0];
-    startTransition(() =>
-      addWeekMovement({
-        dayOfWeek: day.dayOfWeek,
-        exerciseName,
-        patternSlug: pattern.slug,
-        bundleId: null,
-        variant: dayVariant,
-      }),
-    );
+    setErrorMessage(null);
+    startTransition(async () => {
+      try {
+        await addWeekMovement({
+          dayOfWeek: day.dayOfWeek,
+          exerciseName,
+          patternSlug: pattern.slug,
+          bundleId: null,
+          variant: dayVariant,
+        });
+      } catch {
+        setErrorMessage("Couldn't add that movement, try again in a moment.");
+      }
+    });
   }
 
   return (
@@ -199,6 +217,8 @@ function DayCard({
           {day.dayType === "rest" && "A rest day, however you want to spend it."}
         </p>
       )}
+
+      {errorMessage && <p className="mt-2 text-xs text-terracotta-deep">{errorMessage}</p>}
     </div>
   );
 }
@@ -209,20 +229,37 @@ function PlanItemRow({ item }: { item: PlanItemView }) {
   const [reps, setReps] = useState("10");
   const [weight, setWeight] = useState("");
   const [justLogged, setJustLogged] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   function handleLog() {
+    setErrorMessage(null);
     startTransition(async () => {
-      await logProgramEntry({
-        programId: item.programId,
-        patternSlug: item.patternSlug,
-        bundleId: item.bundleId,
-        exerciseName: item.exerciseName,
-        variant: item.variant,
-        reps: reps ? Number(reps) : null,
-        weightKg: weight ? Number(weight) : null,
-      });
-      setJustLogged(true);
-      setTimeout(() => setJustLogged(false), 1500);
+      try {
+        await logProgramEntry({
+          programId: item.programId,
+          patternSlug: item.patternSlug,
+          bundleId: item.bundleId,
+          exerciseName: item.exerciseName,
+          variant: item.variant,
+          reps: reps ? Number(reps) : null,
+          weightKg: weight ? Number(weight) : null,
+        });
+        setJustLogged(true);
+        setTimeout(() => setJustLogged(false), 1500);
+      } catch {
+        setErrorMessage("Couldn't log that, try again in a moment.");
+      }
+    });
+  }
+
+  function handleRemove() {
+    setErrorMessage(null);
+    startTransition(async () => {
+      try {
+        await removeProgramItem(item.id);
+      } catch {
+        setErrorMessage("Couldn't remove that, try again in a moment.");
+      }
     });
   }
 
@@ -239,7 +276,7 @@ function PlanItemRow({ item }: { item: PlanItemView }) {
         <div className="flex items-center gap-1">
           <VideoLink exerciseName={item.exerciseName} />
           <button
-            onClick={() => startTransition(() => removeProgramItem(item.id))}
+            onClick={handleRemove}
             aria-label={`Remove ${item.exerciseName}`}
             className="flex h-11 w-11 items-center justify-center text-ink-faint hover:text-terracotta-deep"
           >
@@ -267,6 +304,8 @@ function PlanItemRow({ item }: { item: PlanItemView }) {
           {isPending ? "Logging…" : justLogged ? "Logged ✓" : "Log today"}
         </Button>
       </div>
+
+      {errorMessage && <p className="mt-1.5 text-xs text-terracotta-deep">{errorMessage}</p>}
 
       {expanded && (
         <div className="mt-2 border-t border-border pt-2">

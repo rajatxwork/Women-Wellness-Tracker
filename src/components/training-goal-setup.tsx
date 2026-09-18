@@ -42,15 +42,23 @@ export function TrainingGoalSetup({ initialAgeBand, initialTrainingLevel, initia
   const [showSuggestion, setShowSuggestion] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [weekApplied, setWeekApplied] = useState<"yes" | "no" | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   function handleSave() {
     if (!goalSlug) return;
+    setErrorMessage(null);
     startTransition(async () => {
-      await saveTrainingProfile({ ageBand, trainingLevel, goalSlugs: [goalSlug] });
-      setSaved(true);
-      setShowSuggestion(true);
-      setWeekApplied(null);
-      setTimeout(() => setSaved(false), 2000);
+      try {
+        await saveTrainingProfile({ ageBand, trainingLevel, goalSlugs: [goalSlug] });
+        setSaved(true);
+        setShowSuggestion(true);
+        setWeekApplied(null);
+        setTimeout(() => setSaved(false), 2000);
+      } catch {
+        setErrorMessage(
+          "Couldn't save that. If this keeps happening, the site may need a database update, check with whoever manages it.",
+        );
+      }
     });
   }
 
@@ -63,10 +71,17 @@ export function TrainingGoalSetup({ initialAgeBand, initialTrainingLevel, initia
       exercises: d.dayType === "strength" ? suggestedExercisesForDay(d.focus, variant) : [],
     }));
 
+    setErrorMessage(null);
     startTransition(async () => {
-      await applyRecommendedProgram({ days, variant });
-      setWeekApplied("yes");
-      setEditing(false);
+      try {
+        await applyRecommendedProgram({ days, variant });
+        setWeekApplied("yes");
+        setEditing(false);
+      } catch {
+        setErrorMessage(
+          "Couldn't build your week. If this keeps happening, the site may need a database update, check with whoever manages it.",
+        );
+      }
     });
   }
 
@@ -170,7 +185,7 @@ export function TrainingGoalSetup({ initialAgeBand, initialTrainingLevel, initia
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Button size="sm" disabled={isPending || !goalSlug} onClick={handleSave}>
           {isPending && !showSuggestion ? "Saving…" : saved ? "Saved ✓" : "Save & suggest a week"}
         </Button>
@@ -180,6 +195,8 @@ export function TrainingGoalSetup({ initialAgeBand, initialTrainingLevel, initia
           </Button>
         )}
       </div>
+
+      {errorMessage && <p className="text-sm text-terracotta-deep">{errorMessage}</p>}
 
       {recommendation && (
         <div className="rounded-2xl border border-border bg-surface-soft p-4">
