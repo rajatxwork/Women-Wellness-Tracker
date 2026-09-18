@@ -66,6 +66,7 @@ export async function addWeekMovement(input: {
   if (error) throw error;
 
   revalidatePath("/workout");
+  revalidatePath("/");
 }
 
 // Applies a full goal-based recommendation in one go: sets every day's type
@@ -93,14 +94,22 @@ export async function applyRecommendedProgram(input: {
 
   const programId = await getOrCreateWeekProgram(supabase, user.id);
 
+  // Building a week from a goal is a full replace, not an append: clear
+  // whatever was there before (from an earlier goal, or manual edits) for
+  // every day this recommendation covers, so old and new exercises never
+  // end up mixed together.
+  const { error: clearError } = await supabase
+    .from("program_items")
+    .delete()
+    .eq("program_id", programId)
+    .in(
+      "day_of_week",
+      input.days.map((d) => d.dayOfWeek),
+    );
+  if (clearError) throw clearError;
+
   for (const day of input.days) {
     if (day.exercises.length === 0) continue;
-
-    const { count } = await supabase
-      .from("program_items")
-      .select("id", { count: "exact", head: true })
-      .eq("program_id", programId)
-      .eq("day_of_week", day.dayOfWeek);
 
     const { error } = await supabase.from("program_items").insert(
       day.exercises.map((ex, i) => ({
@@ -111,13 +120,14 @@ export async function applyRecommendedProgram(input: {
         bundle_id: null,
         variant: input.variant,
         day_of_week: day.dayOfWeek,
-        sort_order: (count ?? 0) + i,
+        sort_order: i,
       })),
     );
     if (error) throw error;
   }
 
   revalidatePath("/workout");
+  revalidatePath("/");
 }
 
 export async function removeProgramItem(itemId: string) {
@@ -135,6 +145,7 @@ export async function removeProgramItem(itemId: string) {
   if (error) throw error;
 
   revalidatePath("/workout");
+  revalidatePath("/");
 }
 
 // Quick-logs one working set for a program's exercise today, creating the

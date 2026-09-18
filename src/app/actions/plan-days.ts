@@ -21,5 +21,6 @@ export async function setPlanDayType(dayOfWeek: number, dayType: DayType) {
   if (error) throw error;
 
   revalidatePath("/workout");
+  revalidatePath("/");
 }
 
