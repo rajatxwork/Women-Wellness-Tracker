@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
 import { MOVEMENT_PATTERNS, type MovementVariant } from "@/lib/data/movement";
+import { repGuidanceForPattern } from "@/lib/data/workout-goals";
 import { setPlanDayType, type DayType } from "@/app/actions/plan-days";
 import { addWeekMovement, removeProgramItem, logProgramEntry } from "@/app/actions/programs";
 import { ExercisePicker, type PickedExercise } from "@/components/exercise-picker";
@@ -263,6 +264,8 @@ function PlanItemRow({ item }: { item: PlanItemView }) {
     });
   }
 
+  const guidance = repGuidanceForPattern(item.patternSlug);
+
   return (
     <div className="rounded-xl bg-surface p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -284,6 +287,12 @@ function PlanItemRow({ item }: { item: PlanItemView }) {
           </button>
         </div>
       </div>
+
+      {guidance && (
+        <p className="mt-1 text-xs text-ink-faint">
+          Aim for {guidance.sets} sets · {guidance.reps} reps
+        </p>
+      )}
 
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <Input

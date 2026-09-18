@@ -4,6 +4,7 @@ import { Dumbbell, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthedUser, getProfile } from "@/lib/supabase/get-user";
 import { formatDateISO } from "@/lib/utils";
+import type { MovementVariant } from "@/lib/data/movement";
 import {
   TRAINING_LEVEL_OPTIONS,
   baselineDayType,
@@ -121,6 +122,7 @@ export default async function WorkoutPage() {
   });
 
   const defaultVariant =
+    (profile?.preferred_variant as MovementVariant | null) ??
     TRAINING_LEVEL_OPTIONS.find((l) => l.value === profile?.training_level)?.defaultVariant ??
     "bodyweight";
 
@@ -151,6 +153,7 @@ export default async function WorkoutPage() {
           initialAgeBand={profile?.age_band as AgeBand | null}
           initialTrainingLevel={profile?.training_level as TrainingLevel | null}
           initialGoalSlugs={profile?.workout_goal_slugs ?? []}
+          initialPreferredVariant={profile?.preferred_variant as MovementVariant | null}
         />
       </Card>
 

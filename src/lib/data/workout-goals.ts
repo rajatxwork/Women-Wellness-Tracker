@@ -31,6 +31,12 @@ export const AGE_BAND_OPTIONS: { value: AgeBand; label: string }[] = [
   { value: "60-plus", label: "60 and beyond" },
 ];
 
+export const ENVIRONMENT_OPTIONS: { value: MovementVariant; label: string; blurb: string }[] = [
+  { value: "gym", label: "Gym", blurb: "Machines, barbells, the full setup." },
+  { value: "home-weights", label: "Home + weights", blurb: "Dumbbells, kettlebells, bands, whatever you've got." },
+  { value: "bodyweight", label: "Bodyweight", blurb: "No equipment at all, just you." },
+];
+
 export const TRAINING_LEVEL_OPTIONS: {
   value: TrainingLevel;
   label: string;
@@ -73,8 +79,6 @@ export type WorkoutGoal = {
   name: string;
   blurb: string;
   structureSummary: string;
-  repRange: string;
-  repRangeWhy: string;
 };
 
 export const WORKOUT_GOALS: WorkoutGoal[] = [
@@ -83,42 +87,46 @@ export const WORKOUT_GOALS: WorkoutGoal[] = [
     name: "General health & overall fitness",
     blurb: "A solid, sustainable baseline, nothing specific, just feeling good and staying capable.",
     structureSummary: "3 full body strength days, 2 cardio days, active recovery worked in.",
-    repRange: "8–12 reps",
-    repRangeWhy: "A middle ground that builds a bit of everything, strength, muscle, and endurance.",
   },
   {
     slug: "strength-muscle",
     name: "Strength & muscle building",
     blurb: "Getting visibly and measurably stronger over time.",
     structureSummary: "4 day upper/lower split, balanced, with cardio and plyo worked in around it.",
-    repRange: "6–10 reps",
-    repRangeWhy: "Heavier loads for fewer reps is what actually drives strength and size over time.",
   },
   {
     slug: "heart-health",
     name: "Better heart health",
     blurb: "Cardio-forward, with enough lifting to keep your muscle and bones strong.",
     structureSummary: "Cardio heavy, 3 cardio days, plus 2 full body lifting days.",
-    repRange: "12–15 reps",
-    repRangeWhy: "Higher reps with shorter rest keeps your heart rate up during your lifting days too.",
   },
   {
     slug: "lower-body-focus",
     name: "Lower body focus",
     blurb: "More squat, hinge, and leg work in the mix, without dropping everything else.",
     structureSummary: "Lower body dominant split, 3 lower days, 1 upper day, cardio and recovery around it.",
-    repRange: "8–12 reps",
-    repRangeWhy: "A dependable range for building strength and shape through your legs and glutes.",
   },
   {
     slug: "fat-loss",
     name: "Fat loss",
     blurb: "A balanced, sustainable mix of lifting and cardio, built so you can actually keep it up.",
     structureSummary: "3 lifting days, 3 cardio days, with active recovery or rest worked in.",
-    repRange: "10–15 reps",
-    repRangeWhy: "Moderate weight, higher reps, and shorter rest keeps total effort and calorie burn high.",
   },
 ];
+
+// The book's "priority" patterns (squat, hinge, pull, push & press) are the
+// big compound lifts; the rest (quads/adductors/abductors, calves, arms,
+// shoulders) are isolation work. Same rule for every goal: 2 sets, and a
+// rep range that depends on which kind of movement it is.
+export const REP_GUIDANCE_NOTE =
+  "2 sets to start: 8–10 reps on compound lifts (squat, hinge, pull, push & press), 10–12 reps on isolation work (quads/adductors/abductors, calves, arms, shoulders).";
+
+export function repGuidanceForPattern(patternSlug: string | null): { sets: number; reps: string } | null {
+  if (!patternSlug) return null;
+  const pattern = MOVEMENT_PATTERNS.find((p) => p.slug === patternSlug);
+  if (!pattern) return null;
+  return { sets: 2, reps: pattern.priority ? "8–10" : "10–12" };
+}
 
 const DAY_LABELS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 

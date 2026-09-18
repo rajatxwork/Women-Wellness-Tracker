@@ -7,6 +7,7 @@ export type Profile = {
   age_band: "20s-30s" | "30s-50s" | "60-plus" | null;
   training_level: "beginner" | "intermediate" | "advanced" | null;
   workout_goal_slugs: string[];
+  preferred_variant: "gym" | "home-weights" | "bodyweight" | null;
   onboarded: boolean;
   terms_accepted_at: string | null;
   created_at: string;

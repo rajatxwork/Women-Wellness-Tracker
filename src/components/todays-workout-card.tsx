@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { TrendingUp, TrendingDown, Plus } from "lucide-react";
 import { MOVEMENT_PATTERNS, type MovementVariant } from "@/lib/data/movement";
+import { repGuidanceForPattern } from "@/lib/data/workout-goals";
 import { logProgramEntry } from "@/app/actions/programs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -164,6 +165,7 @@ function ExerciseCompareRow({ exercise }: { exercise: ExerciseCompare }) {
 
   const lastFormatted = exercise.lastSession ? formatSets(exercise.lastSession.sets) : null;
   const todayFormatted = formatSets(exercise.todaySets);
+  const guidance = repGuidanceForPattern(exercise.patternSlug);
 
   function handleLog() {
     setErrorMessage(null);
@@ -192,6 +194,11 @@ function ExerciseCompareRow({ exercise }: { exercise: ExerciseCompare }) {
         <div>
           <p className="font-serif-display text-base text-ink">{exercise.exerciseName}</p>
           {pattern && <p className="text-xs text-ink-faint">{pattern.name}</p>}
+          {guidance && (
+            <p className="mt-0.5 text-xs text-ink-faint">
+              Aim for {guidance.sets} sets · {guidance.reps} reps
+            </p>
+          )}
         </div>
         <VideoLink exerciseName={exercise.exerciseName} />
       </div>

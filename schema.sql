@@ -17,6 +17,7 @@ create table if not exists public.profiles (
   age_band text check (age_band in ('20s-30s', '30s-50s', '60-plus')),
   training_level text check (training_level in ('beginner', 'intermediate', 'advanced')),
   workout_goal_slugs text[] not null default '{}',
+  preferred_variant text check (preferred_variant in ('gym', 'home-weights', 'bodyweight')),
   onboarded boolean not null default false,
   terms_accepted_at timestamptz,
   created_at timestamptz not null default now(),

@@ -4,14 +4,17 @@ import { useState, useTransition } from "react";
 import { Pencil, CheckCircle2 } from "lucide-react";
 import {
   AGE_BAND_OPTIONS,
+  ENVIRONMENT_OPTIONS,
   TRAINING_LEVEL_OPTIONS,
   WORKOUT_GOALS,
+  REP_GUIDANCE_NOTE,
   buildRecommendation,
   suggestedExercisesForDay,
   type AgeBand,
   type TrainingLevel,
   type WorkoutGoalSlug,
 } from "@/lib/data/workout-goals";
+import type { MovementVariant } from "@/lib/data/movement";
 import { saveTrainingProfile } from "@/app/actions/training-profile";
 import { applyRecommendedProgram } from "@/app/actions/programs";
 import { Button } from "@/components/ui/button";
@@ -21,6 +24,7 @@ type Props = {
   initialAgeBand: AgeBand | null;
   initialTrainingLevel: TrainingLevel | null;
   initialGoalSlugs: string[];
+  initialPreferredVariant: MovementVariant | null;
 };
 
 const DAY_TYPE_LABEL: Record<string, string> = {
@@ -30,13 +34,23 @@ const DAY_TYPE_LABEL: Record<string, string> = {
   rest: "Rest",
 };
 
-export function TrainingGoalSetup({ initialAgeBand, initialTrainingLevel, initialGoalSlugs }: Props) {
+export function TrainingGoalSetup({
+  initialAgeBand,
+  initialTrainingLevel,
+  initialGoalSlugs,
+  initialPreferredVariant,
+}: Props) {
   const initialGoalSlug = (initialGoalSlugs[0] as WorkoutGoalSlug | undefined) ?? null;
-  const hasProfile = Boolean(initialAgeBand && initialTrainingLevel && initialGoalSlug);
+  const hasProfile = Boolean(
+    initialAgeBand && initialTrainingLevel && initialGoalSlug && initialPreferredVariant,
+  );
   const [editing, setEditing] = useState(!hasProfile);
 
   const [ageBand, setAgeBand] = useState<AgeBand>(initialAgeBand ?? "20s-30s");
   const [trainingLevel, setTrainingLevel] = useState<TrainingLevel>(initialTrainingLevel ?? "beginner");
+  const [preferredVariant, setPreferredVariant] = useState<MovementVariant>(
+    initialPreferredVariant ?? "bodyweight",
+  );
   const [goalSlug, setGoalSlug] = useState<WorkoutGoalSlug | null>(initialGoalSlug);
   const [saved, setSaved] = useState(false);
   const [showSuggestion, setShowSuggestion] = useState(false);
@@ -49,7 +63,7 @@ export function TrainingGoalSetup({ initialAgeBand, initialTrainingLevel, initia
     setErrorMessage(null);
     startTransition(async () => {
       try {
-        await saveTrainingProfile({ ageBand, trainingLevel, goalSlugs: [goalSlug] });
+        await saveTrainingProfile({ ageBand, trainingLevel, goalSlugs: [goalSlug], preferredVariant });
         setSaved(true);
         setShowSuggestion(true);
         setWeekApplied(null);
@@ -63,18 +77,17 @@ export function TrainingGoalSetup({ initialAgeBand, initialTrainingLevel, initia
   }
 
   function handleBuildForMe() {
-    const variant = TRAINING_LEVEL_OPTIONS.find((l) => l.value === trainingLevel)!.defaultVariant;
     const rec = buildRecommendation(goalSlug!);
     const days = rec.days.map((d) => ({
       dayOfWeek: d.dayOfWeek,
       dayType: d.dayType,
-      exercises: d.dayType === "strength" ? suggestedExercisesForDay(d.focus, variant) : [],
+      exercises: d.dayType === "strength" ? suggestedExercisesForDay(d.focus, preferredVariant) : [],
     }));
 
     setErrorMessage(null);
     startTransition(async () => {
       try {
-        await applyRecommendedProgram({ days, variant });
+        await applyRecommendedProgram({ days, variant: preferredVariant });
         setWeekApplied("yes");
         setEditing(false);
       } catch {
@@ -93,12 +106,13 @@ export function TrainingGoalSetup({ initialAgeBand, initialTrainingLevel, initia
   if (!editing) {
     const levelLabel = TRAINING_LEVEL_OPTIONS.find((l) => l.value === trainingLevel)?.label;
     const ageLabel = AGE_BAND_OPTIONS.find((a) => a.value === ageBand)?.label;
+    const envLabel = ENVIRONMENT_OPTIONS.find((e) => e.value === preferredVariant)?.label;
     const goalName = WORKOUT_GOALS.find((g) => g.slug === goalSlug)?.name;
     return (
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-surface-soft px-4 py-3">
         <p className="text-sm text-ink-soft">
           <span className="font-medium text-ink">
-            {ageLabel} · {levelLabel}
+            {ageLabel} · {levelLabel} · {envLabel}
           </span>
           {goalName && <span> · {goalName}</span>}
         </p>
@@ -161,6 +175,30 @@ export function TrainingGoalSetup({ initialAgeBand, initialTrainingLevel, initia
       </div>
 
       <div>
+        <p className="mb-2 text-sm font-medium text-ink-soft">Where do you train?</p>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {ENVIRONMENT_OPTIONS.map((e) => (
+            <button
+              key={e.value}
+              onClick={() => setPreferredVariant(e.value)}
+              className={cn(
+                "relative rounded-2xl border-2 p-3 text-left transition-colors",
+                preferredVariant === e.value
+                  ? "border-terracotta bg-terracotta/15"
+                  : "border-border bg-surface-soft hover:border-terracotta/40",
+              )}
+            >
+              {preferredVariant === e.value && (
+                <CheckCircle2 size={16} className="absolute right-2.5 top-2.5 text-terracotta-deep" />
+              )}
+              <p className="pr-5 text-sm font-semibold text-ink">{e.label}</p>
+              <p className="mt-0.5 text-xs text-ink-soft">{e.blurb}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
         <p className="mb-2 text-sm font-medium text-ink-soft">What&apos;s your main goal?</p>
         <div className="grid gap-2 sm:grid-cols-2">
           {WORKOUT_GOALS.map((g) => (
@@ -206,10 +244,8 @@ export function TrainingGoalSetup({ initialAgeBand, initialTrainingLevel, initia
           <p className="mt-1 text-sm text-ink-soft">{recommendation.goal.structureSummary}</p>
 
           <div className="mt-3 rounded-xl bg-surface px-3 py-2.5">
-            <p className="text-sm font-semibold text-ink">
-              Suggested rep range: {recommendation.goal.repRange}
-            </p>
-            <p className="mt-0.5 text-xs text-ink-soft">{recommendation.goal.repRangeWhy}</p>
+            <p className="text-sm font-semibold text-ink">Sets & reps</p>
+            <p className="mt-0.5 text-xs text-ink-soft">{REP_GUIDANCE_NOTE}</p>
           </div>
 
           <div className="mt-3 grid grid-cols-4 gap-1.5 sm:grid-cols-7">
