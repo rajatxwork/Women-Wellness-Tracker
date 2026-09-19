@@ -41,7 +41,7 @@ export function CycleCalendar({
   }
 
   return (
-    <div>
+    <div className="mx-auto max-w-sm">
       <p className="mb-3 text-center font-serif-display text-lg text-ink">
         {format(monthDate, "MMMM yyyy")}
       </p>
@@ -64,7 +64,7 @@ export function CycleCalendar({
             <div
               key={day.toISOString()}
               className={cn(
-                "relative flex aspect-square items-center justify-center rounded-full text-xs",
+                "relative mx-auto flex aspect-square w-full max-w-10 items-center justify-center rounded-full text-xs",
                 !inMonth && "text-ink-faint/40",
                 inMonth && !logged && !predicted && "text-ink-soft",
                 logged && "bg-blush-deep text-white font-semibold",

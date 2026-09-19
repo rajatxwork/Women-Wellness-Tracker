@@ -13,6 +13,26 @@ Recharts components can't read CSS vars, so `src/components/charts.tsx` keeps
 its own hex constants in sync with these tokens by hand — update both places
 together.
 
+Dark mode is not just the light palette inverted — `body` gets an extra
+dark-mode-only ambient radial-gradient wash (plum/terracotta/water at low
+opacity, see the `:root[data-theme="dark"] body, .dark body` rule) so it
+reads as colorful rather than a flat near-black canvas. Keep that if you
+touch dark mode; don't collapse it back to a flat single color.
+
+## Brand imagery
+
+`src/lib/brand-assets.ts` holds URLs for generated brand imagery (logo mark,
+hero background patterns, cycle-phase icons, empty-state illustration) —
+Recraft V4.1 vector generations via the Higgsfield MCP, matched to these
+exact token hex values. They're referenced by URL (Higgsfield's CDN), not
+vendored into `/public`, because the sandbox this was built in blocks
+outbound fetches to that CDN — confirmed for both `curl` and a Playwright
+browser (`net::ERR_TUNNEL_CONNECTION_FAILED`), so the actual image content
+was never visually verified end-to-end, only that the layout degrades
+gracefully to the fallback background color when an image fails to load. If
+you regenerate or need to self-host these, download each URL in
+`brand-assets.ts` and swap the constant for a local `/brand/...` path.
+
 ## The visual language
 
 The app was redesigned to match a set of mobile-UI references (flat, warm,
