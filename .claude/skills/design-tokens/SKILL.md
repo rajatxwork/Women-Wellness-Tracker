@@ -83,15 +83,18 @@ Concretely:
   `backdrop-blur` or glow/gradient orbs as decorative blobs (the old
   `auth-shell.tsx` briefly had three blurred color blobs; that pattern is
   gone — the current gradient band is a real brand element, not a blob).
-- **Real serif headlines.** `.font-serif-display` maps to Instrument Serif
-  (the header/hero typeface), used for page/section headings via
-  `--font-serif`. Instrument Serif ships only a 400 weight — never set
-  `font-weight` above 400 on it, the browser will fake-bold instead of
-  rendering a real cut. Body copy uses Inter via `--font-sans`. The intended
-  body face is actually Cygre Book, but that typeface isn't on Google Fonts
-  and its Behance source is blocked by this sandbox's network policy, so
-  Inter is a stand-in until real Cygre font files are supplied (see the
-  brand imagery section below for the same class of constraint).
+- **Real serif headlines, self-hosted.** `.font-serif-display` maps to
+  Instrument Serif (the header/hero typeface) via `--font-serif`. Body copy
+  is Cygre Book via `--font-sans`. Both are self-hosted licensed `.ttf`
+  files in `src/app/fonts/` (not pulled from Google Fonts or any CDN),
+  loaded with `next/font/local` in `layout.tsx` — this was a deliberate
+  switch off Google Fonts once real font files were available, so don't
+  reintroduce a `next/font/google` import for either of these. Instrument
+  Serif ships only a 400 weight — never set `font-weight` above 400 on it,
+  the browser will fake-bold instead of rendering a real cut. Cygre Book is
+  also a single weight ("Book"); `font-medium`/`font-semibold` on body text
+  render as browser-synthesized bold, which is an accepted tradeoff (only
+  the Book weight was supplied) rather than a bug to fix.
 - **Solid black as the confident neutral accent**, not another pastel.
   `Button`'s `primary` variant is `bg-ink text-cream`; the bottom nav
   (`BottomNav` in `nav.tsx`) is a floating solid-`ink` pill with the active
@@ -135,7 +138,7 @@ gradients the core brand colors are drawn from).
 
 ## Other non-color tokens
 
-- Fonts: `--font-serif` (Instrument Serif, via `.font-serif-display` — headings, weight 400 only) and `--font-sans` (Inter — body, stand-in for the intended Cygre Book).
+- Fonts: `--font-serif` (Instrument Serif, via `.font-serif-display` — headings, weight 400 only) and `--font-sans` (Cygre Book — body, weight 400/"Book" only). Both self-hosted from `src/app/fonts/`, see above.
 - Radius: `--radius-organic` (2rem), `--radius-organic-sm` (1.25rem).
 - Shadows: `--shadow-soft`, `--shadow-softer` — warm near-black tinted (`rgba(32, 26, 16, ...)`) in light mode, black-tinted in dark mode.
 

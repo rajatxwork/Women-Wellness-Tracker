@@ -1,24 +1,29 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Serif, Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
-// Only the weights/styles actually used in the app are loaded, since each
-// extra one is a render-blocking font file on first paint. Instrument Serif
-// only ships a single 400 weight (no bold), by design — it's a display/hero
-// face, leaned on at larger sizes rather than through font-weight.
-const instrumentSerif = Instrument_Serif({
+// Both fonts are self-hosted (licensed .ttf files provided directly),
+// rather than pulled from Google Fonts or any other CDN, so there's no
+// external font-hosting dependency at build or request time. Instrument
+// Serif only ships a single 400 weight (no bold), by design — it's a
+// display/hero face, leaned on at larger sizes rather than through
+// font-weight.
+const instrumentSerif = localFont({
+  src: [
+    { path: "./fonts/InstrumentSerif-Regular.ttf", weight: "400", style: "normal" },
+    { path: "./fonts/InstrumentSerif-Italic.ttf", weight: "400", style: "italic" },
+  ],
   variable: "--font-instrument-serif",
-  subsets: ["latin"],
-  weight: ["400"],
-  style: ["normal", "italic"],
   display: "swap",
 });
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+// Cygre Book: the app's body typeface.
+const cygreBook = localFont({
+  src: "./fonts/CygreBook.ttf",
+  weight: "400",
+  style: "normal",
+  variable: "--font-cygre-book",
   display: "swap",
 });
 
@@ -50,7 +55,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${instrumentSerif.variable} ${inter.variable} h-full antialiased`}
+      className={`${instrumentSerif.variable} ${cygreBook.variable} h-full antialiased`}
     >
       <head>
         <script
