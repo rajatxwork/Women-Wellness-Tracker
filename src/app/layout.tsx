@@ -1,17 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Instrument_Serif, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
 // Only the weights/styles actually used in the app are loaded, since each
-// extra one is a render-blocking font file on first paint. Fraunces is a
-// real serif (unlike the sans-serif Manrope it replaces) for the bold
-// editorial headlines the redesign is built around.
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+// extra one is a render-blocking font file on first paint. Instrument Serif
+// only ships a single 400 weight (no bold), by design — it's a display/hero
+// face, leaned on at larger sizes rather than through font-weight.
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
   subsets: ["latin"],
-  weight: ["500", "600"],
-  style: ["normal"],
+  weight: ["400"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -50,7 +50,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${fraunces.variable} ${inter.variable} h-full antialiased`}
+      className={`${instrumentSerif.variable} ${inter.variable} h-full antialiased`}
     >
       <head>
         <script

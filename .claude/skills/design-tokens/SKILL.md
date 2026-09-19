@@ -83,9 +83,15 @@ Concretely:
   `backdrop-blur` or glow/gradient orbs as decorative blobs (the old
   `auth-shell.tsx` briefly had three blurred color blobs; that pattern is
   gone — the current gradient band is a real brand element, not a blob).
-- **Real serif headlines.** `.font-serif-display` maps to Fraunces (a real
-  serif), used for page/section headings via `--font-serif`. Body copy uses
-  Inter via `--font-sans`.
+- **Real serif headlines.** `.font-serif-display` maps to Instrument Serif
+  (the header/hero typeface), used for page/section headings via
+  `--font-serif`. Instrument Serif ships only a 400 weight — never set
+  `font-weight` above 400 on it, the browser will fake-bold instead of
+  rendering a real cut. Body copy uses Inter via `--font-sans`. The intended
+  body face is actually Cygre Book, but that typeface isn't on Google Fonts
+  and its Behance source is blocked by this sandbox's network policy, so
+  Inter is a stand-in until real Cygre font files are supplied (see the
+  brand imagery section below for the same class of constraint).
 - **Solid black as the confident neutral accent**, not another pastel.
   `Button`'s `primary` variant is `bg-ink text-cream`; the bottom nav
   (`BottomNav` in `nav.tsx`) is a floating solid-`ink` pill with the active
@@ -129,7 +135,7 @@ gradients the core brand colors are drawn from).
 
 ## Other non-color tokens
 
-- Fonts: `--font-serif` (Fraunces, via `.font-serif-display` — headings) and `--font-sans` (Inter — body).
+- Fonts: `--font-serif` (Instrument Serif, via `.font-serif-display` — headings, weight 400 only) and `--font-sans` (Inter — body, stand-in for the intended Cygre Book).
 - Radius: `--radius-organic` (2rem), `--radius-organic-sm` (1.25rem).
 - Shadows: `--shadow-soft`, `--shadow-softer` — warm near-black tinted (`rgba(32, 26, 16, ...)`) in light mode, black-tinted in dark mode.
 

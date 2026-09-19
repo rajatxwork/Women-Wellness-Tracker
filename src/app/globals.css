@@ -93,7 +93,7 @@
   --color-gold: var(--color-gold);
   --color-water: var(--color-water);
 
-  --font-serif: var(--font-fraunces);
+  --font-serif: var(--font-instrument-serif);
   --font-sans: var(--font-inter);
 
   --radius-organic: 2rem;
@@ -124,8 +124,11 @@ body {
 
 .font-serif-display {
   font-family: var(--font-serif);
-  font-weight: 600;
-  letter-spacing: -0.015em;
+  /* Instrument Serif only ships a 400 weight — no 500/600 to fall back to,
+     so don't request one here (the browser would synthesize a fake bold,
+     which looks worse than the real 400 cut at a larger size). */
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 .card-soft {
