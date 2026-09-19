@@ -16,13 +16,32 @@ together.
 ## Brand lockup and italic headings
 
 `src/components/brand-lockup.tsx` (`BrandLockup`) is the flower + "Selene"
-wordmark + tagline lockup — the wordmark is set in Instrument Serif
-*italic*, whole word, not mixed within itself. Used large (`size="lg"`) as
-a hero element on the dashboard and auth screens; don't confuse this with
-the small `logoMark` + plain-upright "Selene" text pairing already in
-`nav.tsx`'s sidebar/mobile header, which stays small and upright on
-purpose (it's a nav-rail label, not a brand moment) — don't blow that one
-up too or swap it to italic without being asked.
+wordmark + tagline lockup, matched pixel-for-pixel against a supplied
+reference image. The wordmark is **not** whole-word italic: consonants
+(S, l, n) are upright, every "e" is individually wrapped in
+`<em className="italic">` — a deliberate mixed-style flourish from the
+reference, hardcoded letter-by-letter since the word is always "Selene."
+Don't collapse it back to a single `italic` class on the whole string.
+Always used at `size="lg"` (large, dominant relative to the page's own
+heading below it — e.g. bigger than "Welcome back" on the login page) on
+the dashboard and auth screens. Give it its own full-width wrapper rather
+than nesting it inside a narrow `max-w-sm` form column — at `lg` size the
+tagline needs more horizontal room than the form does, or it wraps
+awkwardly (see `AuthShell`'s structure: the lockup and the form are
+siblings in a `flex-col` wrapper, not one inside the other's width). Don't
+confuse this with the small `logoMark` + plain-upright "Selene" text
+pairing already in `nav.tsx`'s sidebar/mobile header, which stays small
+and upright on purpose (it's a nav-rail label, not a brand moment) — don't
+blow that one up too or swap it to the mixed-italic style without being
+asked.
+
+`AuthShell` has no gradient background and no decorative bled-off flower
+— both were removed after explicit "remove gradient from login page"
+feedback. It's a flat, nearly-white color (`--color-cream: #f9f6f7` inside
+`.force-light`, sampled directly from the reference image) with just the
+`BrandLockup` and the page's own form card on it. Don't reintroduce a
+gradient band or a decorative background flower image here without being
+asked again — the flat look was a deliberate correction, not an oversight.
 
 Elsewhere, the typographic voice is upright Instrument Serif with a
 **single word inside a heading** switched to italic for emphasis — not the

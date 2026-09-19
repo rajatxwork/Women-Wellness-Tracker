@@ -81,7 +81,9 @@
    descendant always wins over an inherited value, so this doesn't need to
    out-specificity `.dark` — it just needs to not be `.dark` itself. */
 .force-light {
-  --color-cream: #fbf8f1;
+  /* Flat, sampled directly from the auth-screen reference — no gradient,
+     no pink cast. Nearly white with the faintest warm-gray tint. */
+  --color-cream: #f9f6f7;
   --color-cream-soft: #f3ecdc;
   --color-surface: #ffffff;
   --color-surface-soft: #faf6ec;

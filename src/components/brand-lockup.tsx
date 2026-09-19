@@ -23,8 +23,13 @@ export function BrandLockup({
         className={cn(s.flower, "w-auto flex-shrink-0")}
       />
       <div>
-        <p className={cn("font-serif-display italic leading-none text-ink", s.word)}>Selene</p>
-        <p className={cn("mt-1 text-ink-soft", s.tagline)}>Everyday wellness, synced to you.</p>
+        {/* Wordmark mixes upright and italic within the word itself —
+            consonants upright, every "e" italic — matching the reference
+            lockup exactly. Not a whole-word italic. */}
+        <p className={cn("font-serif-display not-italic leading-none text-ink", s.word)}>
+          S<em className="italic">e</em>l<em className="italic">e</em>n<em className="italic">e</em>
+        </p>
+        <p className={cn("mt-1.5 text-ink-soft", s.tagline)}>Everyday wellness, synced to you.</p>
       </div>
     </div>
   );
