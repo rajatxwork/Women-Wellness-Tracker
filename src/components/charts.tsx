@@ -14,21 +14,21 @@ import {
   Area,
 } from "recharts";
 
-const TERRACOTTA = "#6c5ce8";
-const SAGE = "#33c78b";
-const BLUSH = "#c3a8ef";
-const WATER = "#55b6f2";
-const PLUM = "#b17ae8";
+const TERRACOTTA = "#d96b44";
+const SAGE = "#2fae72";
+const BLUSH = "#ef9fac";
+const WATER = "#5ec2f5";
+const PLUM = "#a87ce0";
 
 const tooltipStyle = {
   borderRadius: 20,
-  border: "1px solid #e2ddf3",
+  border: "1px solid #e9e0cd",
   background: "#ffffff",
   fontSize: 13,
-  boxShadow: "0 20px 50px -18px rgba(58,42,120,0.3)",
+  boxShadow: "0 20px 50px -18px rgba(32,26,16,0.25)",
 };
 
-const axisStyle = { fontSize: 12, fill: "#9795b3" };
+const axisStyle = { fontSize: 12, fill: "#a89d8a" };
 
 export function WeightProgressionChart({
   data,
@@ -41,7 +41,7 @@ export function WeightProgressionChart({
   return (
     <ResponsiveContainer width="100%" height={240}>
       <LineChart data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e2ddf3" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#e9e0cd" vertical={false} />
         <XAxis dataKey="date" tick={axisStyle} tickLine={false} axisLine={false} />
         <YAxis tick={axisStyle} tickLine={false} axisLine={false} />
         <Tooltip contentStyle={tooltipStyle} />
@@ -61,11 +61,11 @@ export function WeeklyConsistencyChart({
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e2ddf3" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#e9e0cd" vertical={false} />
         <XAxis dataKey="week" tick={axisStyle} tickLine={false} axisLine={false} />
         <YAxis tick={axisStyle} tickLine={false} axisLine={false} allowDecimals={false} />
         <Tooltip contentStyle={tooltipStyle} />
-        <Bar dataKey="planned" fill="#eae6f7" radius={[8, 8, 0, 0]} name="Planned" />
+        <Bar dataKey="planned" fill="#f3ecdc" radius={[8, 8, 0, 0]} name="Planned" />
         <Bar dataKey="completed" fill={TERRACOTTA} radius={[8, 8, 0, 0]} name="Completed" />
       </BarChart>
     </ResponsiveContainer>
@@ -81,7 +81,7 @@ export function HabitCompletionChart({
   return (
     <ResponsiveContainer width="100%" height={Math.max(160, data.length * 44)}>
       <BarChart data={data} layout="vertical" margin={{ top: 0, right: 24, left: 8, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e2ddf3" horizontal={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#e9e0cd" horizontal={false} />
         <XAxis type="number" domain={[0, 100]} tick={axisStyle} tickLine={false} axisLine={false} unit="%" />
         <YAxis type="category" dataKey="name" tick={axisStyle} tickLine={false} axisLine={false} width={120} />
         <Tooltip contentStyle={tooltipStyle} formatter={(v) => `${v}%`} />
@@ -102,7 +102,7 @@ export function WaterTrendChart({ data }: { data: { date: string; ml: number }[]
             <stop offset="95%" stopColor={WATER} stopOpacity={0.02} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e2ddf3" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#e9e0cd" vertical={false} />
         <XAxis dataKey="date" tick={axisStyle} tickLine={false} axisLine={false} />
         <YAxis tick={axisStyle} tickLine={false} axisLine={false} />
         <Tooltip contentStyle={tooltipStyle} />
@@ -121,7 +121,7 @@ export function NutritionCoverageChart({
   return (
     <ResponsiveContainer width="100%" height={Math.max(160, data.length * 36)}>
       <BarChart data={data} layout="vertical" margin={{ top: 0, right: 24, left: 8, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e2ddf3" horizontal={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#e9e0cd" horizontal={false} />
         <XAxis type="number" domain={[0, 7]} tick={axisStyle} tickLine={false} axisLine={false} />
         <YAxis type="category" dataKey="name" tick={axisStyle} tickLine={false} axisLine={false} width={140} />
         <Tooltip contentStyle={tooltipStyle} formatter={(v) => `${v}/7 days`} />
@@ -140,7 +140,7 @@ export function CycleLengthChart({
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={data} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e2ddf3" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#e9e0cd" vertical={false} />
         <XAxis dataKey="cycle" tick={axisStyle} tickLine={false} axisLine={false} />
         <YAxis tick={axisStyle} tickLine={false} axisLine={false} domain={["dataMin - 3", "dataMax + 3"]} />
         <Tooltip contentStyle={tooltipStyle} formatter={(v) => `${v} days`} />

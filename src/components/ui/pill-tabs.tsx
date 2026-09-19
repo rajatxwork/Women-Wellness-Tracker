@@ -26,8 +26,8 @@ export function PillTabs<T extends string>({
             className={cn(
               "flex h-11 flex-shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-4 text-sm font-semibold transition-colors",
               active
-                ? "border-terracotta bg-terracotta text-white"
-                : "border-border bg-surface-soft text-ink-soft hover:border-terracotta/40",
+                ? "border-ink bg-ink text-cream"
+                : "border-border bg-surface-soft text-ink-soft hover:border-ink/30",
             )}
           >
             {opt.label}

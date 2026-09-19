@@ -1,14 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope, Inter } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
 // Only the weights/styles actually used in the app are loaded, since each
-// extra one is a render-blocking font file on first paint.
-const manrope = Manrope({
-  variable: "--font-manrope",
+// extra one is a render-blocking font file on first paint. Fraunces is a
+// real serif (unlike the sans-serif Manrope it replaces) for the bold
+// editorial headlines the redesign is built around.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
-  weight: ["700"],
+  weight: ["500", "600"],
+  style: ["normal"],
   display: "swap",
 });
 
@@ -33,8 +36,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f4f2fb" },
-    { media: "(prefers-color-scheme: dark)", color: "#0d0c16" },
+    { media: "(prefers-color-scheme: light)", color: "#fbf8f1" },
+    { media: "(prefers-color-scheme: dark)", color: "#14120d" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -47,7 +50,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${manrope.variable} ${inter.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${inter.variable} h-full antialiased`}
     >
       <head>
         <script

@@ -5,7 +5,7 @@ export function PageHeading({
   icon: Icon,
   title,
   subtitle,
-  accentClass = "bg-blush/40 text-terracotta-deep",
+  accentClass = "bg-blush/40 text-blush-deep",
 }: {
   icon: LucideIcon;
   title: string;

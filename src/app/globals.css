@@ -3,58 +3,62 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --color-cream: #f4f2fb;
-  --color-cream-soft: #eae6f7;
+  /* Warm ivory paper, not purple-tinted, matching the flat editorial
+     reference look rather than a cool glassmorphism wash. */
+  --color-cream: #fbf8f1;
+  --color-cream-soft: #f3ecdc;
   --color-surface: #ffffff;
-  --color-surface-soft: #f7f5fc;
-  --color-ink: #1f1d33;
-  --color-ink-soft: #5c5977;
-  --color-ink-faint: #9795b3;
-  --color-border: #e2ddf3;
+  --color-surface-soft: #faf6ec;
+  --color-ink: #201c16;
+  --color-ink-soft: #6b6255;
+  --color-ink-faint: #a89d8a;
+  --color-border: #e9e0cd;
 
-  --color-blush: #ddccf7;
-  --color-blush-deep: #c3a8ef;
-  --color-terracotta: #6c5ce8;
-  --color-terracotta-deep: #5642d6;
-  --color-sage: #6be0ac;
-  --color-sage-deep: #33c78b;
-  --color-plum: #b17ae8;
-  --color-gold: #ffb26b;
+  /* Each accent is a true, distinct flat color rather than one repeated
+     hue at different opacities, one per semantic role: */
+  --color-blush: #fbd0d6; /* soft pink - cycle/period */
+  --color-blush-deep: #d1546c;
+  --color-terracotta: #d96b44; /* warm clay - primary link/highlight */
+  --color-terracotta-deep: #b8502f;
+  --color-sage: #8fdda8; /* mint - nutrition/positive */
+  --color-sage-deep: #2fae72;
+  --color-plum: #a87ce0; /* purple - library/rest, used sparingly */
+  --color-gold: #ffc670; /* amber - energy/calories/highlights */
 
-  --color-water: #55b6f2;
+  --color-water: #5ec2f5; /* sky blue - hydration/cardio */
 
-  --shadow-soft: 0 20px 50px -18px rgba(58, 42, 120, 0.28);
-  --shadow-softer: 0 8px 24px -12px rgba(58, 42, 120, 0.18);
-  --glass-border: rgba(255, 255, 255, 0.6);
-  --glass-bg: color-mix(in srgb, var(--color-surface) 72%, transparent);
+  --shadow-soft: 0 20px 45px -20px rgba(32, 26, 16, 0.22);
+  --shadow-softer: 0 6px 18px -10px rgba(32, 26, 16, 0.12);
+  --glass-border: var(--color-border);
+  --glass-bg: var(--color-surface);
 }
 
 :root[data-theme="dark"],
 .dark {
-  --color-cream: #0d0c16;
-  --color-cream-soft: #15131f;
-  --color-surface: #191726;
-  --color-surface-soft: #1e1b2c;
-  --color-ink: #f1eefb;
-  --color-ink-soft: #bcb8d6;
-  --color-ink-faint: #7f7ba0;
-  --color-border: #2b283d;
+  --color-cream: #14120d;
+  --color-cream-soft: #1b1812;
+  --color-surface: #211d16;
+  --color-surface-soft: #27231b;
+  --color-ink: #f5f0e6;
+  --color-ink-soft: #beb4a1;
+  --color-ink-faint: #8a8071;
+  --color-border: #362f24;
 
-  --color-blush: #a794e0;
-  --color-blush-deep: #c4b3f0;
-  --color-terracotta: #8b7bff;
-  --color-terracotta-deep: #a698ff;
-  --color-sage: #4fe6a3;
-  --color-sage-deep: #7cf3bf;
-  --color-plum: #c99df2;
-  --color-gold: #ffbd7a;
+  --color-blush: #d98a97;
+  --color-blush-deep: #f4b8c4;
+  --color-terracotta: #e88358;
+  --color-terracotta-deep: #f0a17c;
+  --color-sage: #5cc98d;
+  --color-sage-deep: #7fe3ab;
+  --color-plum: #b491e8;
+  --color-gold: #f2b968;
 
-  --color-water: #5fc9ff;
+  --color-water: #5fc3f5;
 
-  --shadow-soft: 0 24px 60px -16px rgba(0, 0, 0, 0.6);
-  --shadow-softer: 0 10px 28px -12px rgba(0, 0, 0, 0.5);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-bg: color-mix(in srgb, var(--color-surface) 62%, transparent);
+  --shadow-soft: 0 24px 55px -18px rgba(0, 0, 0, 0.55);
+  --shadow-softer: 0 8px 22px -12px rgba(0, 0, 0, 0.45);
+  --glass-border: var(--color-border);
+  --glass-bg: var(--color-surface);
 }
 
 @theme inline {
@@ -77,7 +81,7 @@
   --color-gold: var(--color-gold);
   --color-water: var(--color-water);
 
-  --font-serif: var(--font-manrope);
+  --font-serif: var(--font-fraunces);
   --font-sans: var(--font-inter);
 
   --radius-organic: 2rem;
@@ -88,11 +92,6 @@ body {
   background: var(--color-cream);
   color: var(--color-ink);
   font-family: var(--font-sans);
-  background-image:
-    radial-gradient(circle at 8% 8%, color-mix(in srgb, var(--color-terracotta) 16%, transparent), transparent 42%),
-    radial-gradient(circle at 92% 18%, color-mix(in srgb, var(--color-sage) 14%, transparent), transparent 40%),
-    radial-gradient(circle at 50% 100%, color-mix(in srgb, var(--color-water) 10%, transparent), transparent 45%);
-  background-attachment: fixed;
 }
 
 * {
@@ -101,17 +100,15 @@ body {
 
 .font-serif-display {
   font-family: var(--font-serif);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-weight: 600;
+  letter-spacing: -0.015em;
 }
 
 .card-soft {
-  background: var(--glass-bg);
+  background: var(--color-surface);
   border-radius: var(--radius-organic);
   box-shadow: var(--shadow-softer);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
 }
 
 .wave-divider {

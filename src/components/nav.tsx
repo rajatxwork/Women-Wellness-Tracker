@@ -31,21 +31,21 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/80 md:hidden">
-      <ul className="flex items-stretch justify-between px-1 pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 px-3 pb-[calc(0.6rem+env(safe-area-inset-bottom))] md:hidden">
+      <ul className="mx-auto flex max-w-md items-center justify-between gap-0.5 rounded-full bg-ink px-2 py-2 shadow-soft">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
-            <li key={href} className="flex-1">
+            <li key={href} className="flex flex-1 justify-center">
               <Link
                 href={href}
+                aria-label={label}
                 className={cn(
-                  "flex flex-col items-center gap-0.5 px-1 py-2.5 text-[11px] font-medium transition-colors",
-                  active ? "text-terracotta-deep" : "text-ink-faint",
+                  "flex h-10 w-10 items-center justify-center rounded-full transition-colors",
+                  active ? "bg-cream text-ink" : "text-cream/55 hover:text-cream",
                 )}
               >
-                <Icon size={20} strokeWidth={active ? 2.4 : 1.8} />
-                {label}
+                <Icon size={18} strokeWidth={active ? 2.4 : 1.8} />
               </Link>
             </li>
           );
@@ -76,9 +76,9 @@ export function Sidebar({ userName }: { userName: string }) {
               <Link
                 href={href}
                 className={cn(
-                  "flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-full px-3.5 py-2.5 text-sm font-medium transition-colors",
                   active
-                    ? "bg-blush/60 text-ink"
+                    ? "bg-ink text-cream"
                     : "text-ink-soft hover:bg-cream-soft",
                 )}
               >
