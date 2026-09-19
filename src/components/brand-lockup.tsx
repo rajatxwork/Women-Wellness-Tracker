@@ -1,0 +1,31 @@
+import { cn } from "@/lib/utils";
+import { BRAND_ASSETS } from "@/lib/brand-assets";
+
+const SIZES = {
+  md: { flower: "h-16", word: "text-4xl sm:text-5xl", tagline: "text-sm" },
+  lg: { flower: "h-20 sm:h-24", word: "text-6xl sm:text-7xl", tagline: "text-base sm:text-lg" },
+} as const;
+
+export function BrandLockup({
+  size = "md",
+  className,
+}: {
+  size?: keyof typeof SIZES;
+  className?: string;
+}) {
+  const s = SIZES[size];
+  return (
+    <div className={cn("flex items-center gap-4", className)}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={BRAND_ASSETS.flowerBackground}
+        alt=""
+        className={cn(s.flower, "w-auto flex-shrink-0 dark:brightness-125 dark:saturate-150 dark:contrast-110")}
+      />
+      <div>
+        <p className={cn("font-serif-display italic leading-none text-ink", s.word)}>Selene</p>
+        <p className={cn("mt-1 text-ink-soft", s.tagline)}>Everyday wellness, synced to you.</p>
+      </div>
+    </div>
+  );
+}

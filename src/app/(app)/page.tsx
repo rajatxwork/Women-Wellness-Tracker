@@ -2,6 +2,7 @@ import Link from "next/link";
 import { format, subDays, differenceInCalendarDays } from "date-fns";
 import { Dumbbell, Apple } from "lucide-react";
 import { BRAND_ASSETS } from "@/lib/brand-assets";
+import { BrandLockup } from "@/components/brand-lockup";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthedUser, getProfile } from "@/lib/supabase/get-user";
 import { todayISO, formatDateISO } from "@/lib/utils";
@@ -149,6 +150,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      <BrandLockup size="lg" className="justify-center py-2 sm:justify-start" />
+
       <div
         className="relative overflow-hidden rounded-organic border border-border bg-cover bg-center p-5 sm:p-6"
         style={{ backgroundImage: `url(${BRAND_ASSETS.gradientPinkCream}), var(--gradient-hero)` }}
@@ -158,7 +161,13 @@ export default async function DashboardPage() {
         </p>
         <p className="mt-1 text-ink-soft">{getGreeting(seed)}</p>
         <h1 className="font-serif-display text-3xl text-ink sm:text-4xl">
-          {profile?.name ? `Hi, ${profile.name}` : "Hi there"}
+          {profile?.name ? (
+            <>
+              Hi, <em className="italic">{profile.name}</em>
+            </>
+          ) : (
+            "Hi there"
+          )}
         </h1>
         <p className="mt-2 text-ink-soft">{getCelebration(seed + 3)}</p>
       </div>

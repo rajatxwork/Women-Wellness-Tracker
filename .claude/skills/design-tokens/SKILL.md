@@ -13,6 +13,39 @@ Recharts components can't read CSS vars, so `src/components/charts.tsx` keeps
 its own hex constants in sync with these tokens by hand — update both places
 together.
 
+## Brand lockup and italic headings
+
+`src/components/brand-lockup.tsx` (`BrandLockup`) is the flower + "Selene"
+wordmark + tagline lockup — the wordmark is set in Instrument Serif
+*italic*, whole word, not mixed within itself. Used large (`size="lg"`) as
+a hero element on the dashboard and auth screens; don't confuse this with
+the small `logoMark` + plain-upright "Selene" text pairing already in
+`nav.tsx`'s sidebar/mobile header, which stays small and upright on
+purpose (it's a nav-rail label, not a brand moment) — don't blow that one
+up too or swap it to italic without being asked.
+
+Elsewhere, the typographic voice is upright Instrument Serif with a
+**single word inside a heading** switched to italic for emphasis — not the
+whole heading, and not applied to every heading on every page. Established
+examples: the cycle page's "Your *cycle*" and the dashboard greeting's
+"Hi, *{name}*". Use `<em className="italic">word</em>` for this (not a
+whole-heading `italic` class). Keep it to headings where one word is
+naturally the emotional/personal focus (a page's subject, a person's
+name) — resist italicizing every page title just for consistency; the
+instruction behind this pattern was explicitly "use it tastefully."
+
+Any `<img>` of `BRAND_ASSETS.logoMark` or `flowerBackground` needs
+`dark:brightness-125 dark:saturate-150 dark:contrast-110` (or equivalent)
+— the flower's pastel colors read as washed-out/faded against a dark
+background without it. Every existing usage has this; keep it on new ones.
+
+`AuthShell` forces light mode via the `.force-light` class in
+`globals.css` regardless of the visitor's OS/system theme — auth screens
+have no theme toggle and are a first-impression branding moment, so they
+never go dark, even if the rest of the app does for that same visitor.
+Don't remove `.force-light` from `AuthShell`'s root thinking it's dead
+code; it's the fix for a real "why is my login page black" complaint.
+
 ## No purple, ever
 
 This is an explicit, standing product rule, not a one-time cleanup: **no hue

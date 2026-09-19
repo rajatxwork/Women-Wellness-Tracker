@@ -64,11 +64,13 @@ export default async function CyclePage() {
             <img
               src={cycleStatus ? PHASE_ICONS[cycleStatus.phase] : BRAND_ASSETS.logoMark}
               alt=""
-              className="h-6 w-6 object-contain"
+              className="h-6 w-6 object-contain dark:brightness-125 dark:saturate-150 dark:contrast-110"
             />
           </span>
           <div>
-            <h1 className="font-serif-display text-3xl text-ink">Your cycle</h1>
+            <h1 className="font-serif-display text-3xl text-ink">
+              Your <em className="italic">cycle</em>
+            </h1>
             <p className="mt-1 text-sm text-ink-soft">
               Tracked gently, not obsessively, just enough to understand your own patterns.
             </p>

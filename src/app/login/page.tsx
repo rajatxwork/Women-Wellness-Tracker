@@ -20,10 +20,9 @@ export default function LoginPage() {
 
   return (
     <AuthShell>
+      {/* No icon badge here on purpose — reserved for a future profile
+          picture once returning users can be recognized. */}
       <div className="mb-8 text-center">
-        <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-terracotta/15 flex items-center justify-center">
-          <span className="text-2xl">🌿</span>
-        </div>
         <h1 className="font-serif-display text-3xl text-ink">Welcome back</h1>
         <p className="mt-2 text-ink-soft">Good to see you again.</p>
       </div>

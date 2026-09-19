@@ -13,9 +13,6 @@ export default function ForgotPasswordPage() {
   return (
     <AuthShell>
       <div className="mb-8 text-center">
-        <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-terracotta/15 flex items-center justify-center">
-          <span className="text-2xl">🔑</span>
-        </div>
         <h1 className="font-serif-display text-3xl text-ink">Forgot your password?</h1>
         <p className="mt-2 text-ink-soft">
           No worries, tell us the email you signed up with and we&apos;ll send you a link.

@@ -73,6 +73,43 @@
   --glass-bg: var(--color-surface);
 }
 
+/* Forces the light palette on a subtree regardless of an ancestor .dark
+   class — used on the auth screens (login/signup/etc.), which have no
+   theme toggle of their own and shouldn't silently go near-black just
+   because the visitor's OS is in dark mode; the branded warm gradient is
+   the first-impression look on purpose. A direct redeclaration on a
+   descendant always wins over an inherited value, so this doesn't need to
+   out-specificity `.dark` — it just needs to not be `.dark` itself. */
+.force-light {
+  --color-cream: #fbf8f1;
+  --color-cream-soft: #f3ecdc;
+  --color-surface: #ffffff;
+  --color-surface-soft: #faf6ec;
+  --color-ink: #201c16;
+  --color-ink-soft: #6b6255;
+  --color-ink-faint: #a89d8a;
+  --color-border: #e9e0cd;
+
+  --color-blush: #fbd0d6;
+  --color-blush-deep: #d1546c;
+  --color-terracotta: #d96b44;
+  --color-terracotta-deep: #b8502f;
+  --color-sage: #8fdda8;
+  --color-sage-deep: #2fae72;
+  --color-rose: #c2577a;
+  --color-gold: #ffc670;
+
+  --color-water: #5ec2f5;
+
+  --gradient-hero: linear-gradient(165deg, #ffd6e2 0%, #fff1e0 55%, #fffaf2 100%);
+  --gradient-glow: radial-gradient(circle at 50% 20%, #ffe9b8 0%, #ffd2de 48%, #fff9f1 100%);
+
+  --shadow-soft: 0 20px 45px -20px rgba(32, 26, 16, 0.22);
+  --shadow-softer: 0 6px 18px -10px rgba(32, 26, 16, 0.12);
+  --glass-border: var(--color-border);
+  --glass-bg: var(--color-surface);
+}
+
 @theme inline {
   --color-cream: var(--color-cream);
   --color-cream-soft: var(--color-cream-soft);
