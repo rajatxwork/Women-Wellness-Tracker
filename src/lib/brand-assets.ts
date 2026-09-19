@@ -1,11 +1,13 @@
-// Generated via Higgsfield to match the app's flat, warm, honestly-named
-// color tokens (see design-tokens skill). Hosted on Higgsfield's CDN rather
-// than vendored into /public: this repo's sandbox network policy blocks
-// outbound fetches to that CDN (confirmed for curl and for a Playwright
-// browser, net::ERR_TUNNEL_CONNECTION_FAILED), so the files couldn't be
-// downloaded and committed locally, or their content visually verified from
-// this sandbox. If that ever needs to change, download each URL below and
-// swap the constant for a local `/brand/...` path.
+// Most of these were generated via Higgsfield to match the app's flat,
+// warm, honestly-named color tokens (see design-tokens skill); logoMark is
+// an exception, sourced directly from Midjourney. All of them are hosted
+// externally rather than vendored into /public: this repo's sandbox
+// network policy blocks outbound fetches to both the Higgsfield CDN and
+// cdn.midjourney.com (confirmed for curl and for a Playwright browser,
+// net::ERR_TUNNEL_CONNECTION_FAILED / CONNECT 403), so none of these files
+// could be downloaded and committed locally, or their content visually
+// verified from this sandbox. If that ever needs to change, download each
+// URL below and swap the constant for a local `/brand/...` path.
 //
 // Core brand background gradients (pink -> cream -> warm gold, matching
 // reference-images/background/) are generated via gpt_image_2_5. These are
@@ -16,7 +18,10 @@
 // inline style background-color) is what actually renders if the image
 // never loads. Never remove that CSS fallback when using these.
 export const BRAND_ASSETS = {
-  logoMark: "https://d8j0ntlcm91z4.cloudfront.net/user_3JWZo2SP4ZSdZIUVqHwLuusIPqQ/hf_20260919_012719_7129ab3f-2836-449e-ac55-be11288b1ea0.svg",
+  // Sourced from Midjourney directly (cdn.midjourney.com), not Higgsfield —
+  // this one wasn't generated in this session and its content was never
+  // seen or verified here (see design-tokens skill for why).
+  logoMark: "https://cdn.midjourney.com/49c3df9d-2981-4c88-9877-48664036ed8b/0_0.png",
   emptyStatePlant: "https://d8j0ntlcm91z4.cloudfront.net/user_3JWZo2SP4ZSdZIUVqHwLuusIPqQ/hf_20260919_012719_adba991c-597c-444a-9693-7aa12455aac6.svg",
   gradientPinkCream: "https://d8j0ntlcm91z4.cloudfront.net/user_3JWZo2SP4ZSdZIUVqHwLuusIPqQ/hf_20260919_015806_137e99e4-1bf2-468c-abb6-dd12255a1522.png",
   gradientPinkGold: "https://d8j0ntlcm91z4.cloudfront.net/user_3JWZo2SP4ZSdZIUVqHwLuusIPqQ/hf_20260919_015806_b71d0dbc-5226-438e-9dec-4d1e64806ab8.png",
