@@ -64,7 +64,7 @@ export function Sidebar({ userName }: { userName: string }) {
       <div className="mb-8 px-3">
         <div className="flex items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={BRAND_ASSETS.logoMark} alt="" className="h-7 w-7" />
+          <img src={BRAND_ASSETS.logoMark} alt="" className="h-7 w-auto" />
           <span className="font-serif-display text-xl text-ink">Selene</span>
         </div>
         <p className="mt-1 truncate px-0 text-sm text-ink-soft">Hi, {userName}</p>
@@ -122,7 +122,7 @@ export function MobileHeader({ userName }: { userName: string }) {
     <header className="flex items-center justify-between border-b border-border bg-surface px-4 py-3 md:hidden">
       <div className="flex items-center gap-2">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={BRAND_ASSETS.logoMark} alt="" className="h-6 w-6" />
+        <img src={BRAND_ASSETS.logoMark} alt="" className="h-6 w-auto" />
         <span className="font-serif-display text-lg text-ink">Selene</span>
         <span className="text-xs text-ink-faint">· {userName}</span>
       </div>

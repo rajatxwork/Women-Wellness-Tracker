@@ -64,7 +64,7 @@ export default async function CyclePage() {
             <img
               src={cycleStatus ? PHASE_ICONS[cycleStatus.phase] : BRAND_ASSETS.logoMark}
               alt=""
-              className="h-6 w-6"
+              className="h-6 w-6 object-contain"
             />
           </span>
           <div>

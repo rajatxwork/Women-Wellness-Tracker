@@ -18,10 +18,19 @@
 // inline style background-color) is what actually renders if the image
 // never loads. Never remove that CSS fallback when using these.
 export const BRAND_ASSETS = {
-  // Sourced from Midjourney directly (cdn.midjourney.com), not Higgsfield —
-  // this one wasn't generated in this session and its content was never
-  // seen or verified here (see design-tokens skill for why).
-  logoMark: "https://cdn.midjourney.com/49c3df9d-2981-4c88-9877-48664036ed8b/0_0.png",
+  // Local files, unlike everything else here: the Midjourney flower image
+  // supplied directly in chat, background-removed locally with Pillow
+  // (public/brand/ — see git history for the extraction script) since
+  // cdn.midjourney.com is blocked from this sandbox the same way the
+  // Higgsfield CDN is. logoMark is a small pre-scaled PNG for the nav/icon
+  // use (240px wide); flowerBackground is the full-res WebP for the
+  // enlarged/cropped decorative background use. Both are natively
+  // transparent — no white background. The source is 2000x1506 (not
+  // square, ratio ~1.33:1) — always size these with the aspect ratio
+  // preserved (e.g. fixed height + `w-auto`, never equal fixed h/w) or the
+  // flower visibly squishes.
+  logoMark: "/brand/flower-mark-icon.png",
+  flowerBackground: "/brand/flower-mark-bg.webp",
   emptyStatePlant: "https://d8j0ntlcm91z4.cloudfront.net/user_3JWZo2SP4ZSdZIUVqHwLuusIPqQ/hf_20260919_012719_adba991c-597c-444a-9693-7aa12455aac6.svg",
   gradientPinkCream: "https://d8j0ntlcm91z4.cloudfront.net/user_3JWZo2SP4ZSdZIUVqHwLuusIPqQ/hf_20260919_015806_137e99e4-1bf2-468c-abb6-dd12255a1522.png",
   gradientPinkGold: "https://d8j0ntlcm91z4.cloudfront.net/user_3JWZo2SP4ZSdZIUVqHwLuusIPqQ/hf_20260919_015806_b71d0dbc-5226-438e-9dec-4d1e64806ab8.png",

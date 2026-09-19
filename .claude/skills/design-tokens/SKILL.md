@@ -70,6 +70,28 @@ image is used layers it *on top of* the CSS gradient in the same
 gradient is what actually renders if the image never loads. Never use a
 generated background image without that CSS gradient fallback underneath it.
 
+**Exception — the flower mark is local, not remote.** `BRAND_ASSETS.logoMark`
+(`/brand/flower-mark-icon.png`) and `flowerBackground`
+(`/brand/flower-mark-bg.webp`) are real files in `public/brand/`, not
+external URLs — a Midjourney image supplied directly in chat, with its
+white background removed locally via a Pillow script (not Higgsfield's
+`remove_background`, which needs the image already in Higgsfield's media
+pipeline; this image never was). Read `public/brand/` via git history for
+the exact extraction approach if redoing this for another image: naive
+"alpha from distance-to-white, then unpremultiply" corrupts colors when the
+source has pastel/light content that's legitimately part of the subject
+(as this flower's pale center glow was) — treat that as a real risk on any
+similar cutout, not a one-off bug. Because these are local files, they're
+the one part of brand imagery that *was* visually verified in this sandbox
+(Playwright screenshot, composited against multiple background colors to
+confirm the cutout).
+
+The flower source image is 2000×1506 (ratio ≈1.33:1, not square). Never
+size it with equal fixed height/width classes (e.g. `h-7 w-7`) — that
+silently stretches it. Use a fixed height with `w-auto` (small icon use,
+see `nav.tsx`) or `object-contain` within a fixed box (see the cycle page's
+badge, which swaps between this and square phase icons in the same slot).
+
 ## The visual language
 
 The app was redesigned to match a set of mobile-UI references (flat, warm,
