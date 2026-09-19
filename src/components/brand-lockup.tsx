@@ -20,7 +20,7 @@ export function BrandLockup({
       <img
         src={BRAND_ASSETS.flowerBackground}
         alt=""
-        className={cn(s.flower, "w-auto flex-shrink-0 dark:brightness-125 dark:saturate-150 dark:contrast-110")}
+        className={cn(s.flower, "w-auto flex-shrink-0")}
       />
       <div>
         <p className={cn("font-serif-display italic leading-none text-ink", s.word)}>Selene</p>

@@ -34,17 +34,29 @@ naturally the emotional/personal focus (a page's subject, a person's
 name) — resist italicizing every page title just for consistency; the
 instruction behind this pattern was explicitly "use it tastefully."
 
-Any `<img>` of `BRAND_ASSETS.logoMark` or `flowerBackground` needs
-`dark:brightness-125 dark:saturate-150 dark:contrast-110` (or equivalent)
-— the flower's pastel colors read as washed-out/faded against a dark
-background without it. Every existing usage has this; keep it on new ones.
+**Never put a `dark:brightness-*`/`dark:saturate-*`/`dark:contrast-*` filter
+on `BRAND_ASSETS.logoMark` or `flowerBackground`.** This was tried once (to
+stop the flower's pastel colors reading as washed-out against a dark
+background) and reverted after it broke `AuthShell`: `dark:*` utilities key
+off the `.dark` class on `<html>`, which is completely independent of the
+`.force-light` CSS-variable override below — so the filter kept firing
+inside the forced-light auth screens (where `.dark` is still present even
+though the colors are forced light) and blew the logo out to a washed
+ghost-white blob. Explicit standing instruction since: the logo renders
+exactly as the source file, everywhere, in both themes, no filters, no
+adjustments — full stop.
 
 `AuthShell` forces light mode via the `.force-light` class in
 `globals.css` regardless of the visitor's OS/system theme — auth screens
 have no theme toggle and are a first-impression branding moment, so they
 never go dark, even if the rest of the app does for that same visitor.
 Don't remove `.force-light` from `AuthShell`'s root thinking it's dead
-code; it's the fix for a real "why is my login page black" complaint.
+code; it's the fix for a real "why is my login page black" complaint. But
+remember it only overrides the color token *values* — it does not remove
+the `.dark` class itself, so any `dark:` Tailwind variant (filters,
+otherwise) still matches inside it. That mismatch is exactly what caused
+the logo bug above; keep it in mind before adding any other `dark:` utility
+inside `AuthShell`.
 
 ## No purple, ever
 
