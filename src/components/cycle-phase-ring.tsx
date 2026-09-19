@@ -4,14 +4,14 @@ const RING_COLOR: Record<CyclePhase, string> = {
   menstrual: "var(--color-blush-deep)",
   follicular: "var(--color-sage-deep)",
   ovulation: "var(--color-terracotta-deep)",
-  luteal: "var(--color-plum)",
+  luteal: "var(--color-rose)",
 };
 
 const TRACK_COLOR: Record<CyclePhase, string> = {
   menstrual: "var(--color-blush)",
   follicular: "var(--color-sage)",
   ovulation: "var(--color-gold)",
-  luteal: "var(--color-plum)",
+  luteal: "var(--color-rose)",
 };
 
 export function CyclePhaseRing({

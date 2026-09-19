@@ -18,7 +18,7 @@ const TERRACOTTA = "#d96b44";
 const SAGE = "#2fae72";
 const BLUSH = "#ef9fac";
 const WATER = "#5ec2f5";
-const PLUM = "#a87ce0";
+const ROSE = "#c2577a";
 
 const tooltipStyle = {
   borderRadius: 20,
@@ -144,7 +144,7 @@ export function CycleLengthChart({
         <XAxis dataKey="cycle" tick={axisStyle} tickLine={false} axisLine={false} />
         <YAxis tick={axisStyle} tickLine={false} axisLine={false} domain={["dataMin - 3", "dataMax + 3"]} />
         <Tooltip contentStyle={tooltipStyle} formatter={(v) => `${v} days`} />
-        <Bar dataKey="length" fill={PLUM} radius={[8, 8, 0, 0]} />
+        <Bar dataKey="length" fill={ROSE} radius={[8, 8, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );

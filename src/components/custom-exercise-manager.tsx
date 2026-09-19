@@ -73,7 +73,7 @@ export function CustomExerciseManager({
           {bundles.map((b) => (
             <span
               key={b.id}
-              className="flex items-center gap-1.5 rounded-full bg-plum/15 px-3 py-1.5 text-xs font-medium text-ink"
+              className="flex items-center gap-1.5 rounded-full bg-rose/15 px-3 py-1.5 text-xs font-medium text-ink"
             >
               {b.name}
               <button

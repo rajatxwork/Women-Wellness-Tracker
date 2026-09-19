@@ -55,8 +55,8 @@ export default async function CyclePage() {
   return (
     <div className="space-y-6">
       <div
-        className="relative overflow-hidden rounded-organic border border-border bg-blush bg-cover bg-top p-5 sm:p-6"
-        style={{ backgroundImage: `url(${BRAND_ASSETS.bgBlush})` }}
+        className="relative overflow-hidden rounded-organic border border-border bg-cover bg-top p-5 sm:p-6"
+        style={{ backgroundImage: `url(${BRAND_ASSETS.gradientCornerGlow}), var(--gradient-glow)` }}
       >
         <div className="flex items-center gap-3">
           <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-surface/70">

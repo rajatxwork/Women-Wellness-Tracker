@@ -15,17 +15,26 @@
   --color-border: #e9e0cd;
 
   /* Each accent is a true, distinct flat color rather than one repeated
-     hue at different opacities, one per semantic role: */
-  --color-blush: #fbd0d6; /* soft pink - cycle/period */
+     hue at different opacities, one per semantic role. No purple anywhere
+     in this palette, by design: pink, gold/amber and white are the core
+     brand colors (see the gradient tokens below), with sage/terracotta/
+     water kept only as functional category accents. */
+  --color-blush: #fbd0d6; /* soft pink - cycle/period, core brand color */
   --color-blush-deep: #d1546c;
   --color-terracotta: #d96b44; /* warm clay - primary link/highlight */
   --color-terracotta-deep: #b8502f;
   --color-sage: #8fdda8; /* mint - nutrition/positive */
   --color-sage-deep: #2fae72;
-  --color-plum: #a87ce0; /* purple - library/rest, used sparingly */
-  --color-gold: #ffc670; /* amber - energy/calories/highlights */
+  --color-rose: #c2577a; /* deep dusty rose - library/rest, used sparingly (stays in the pink family, never purple) */
+  --color-gold: #ffc670; /* amber - energy/calories/highlights, core brand color */
 
   --color-water: #5ec2f5; /* sky blue - hydration/cardio */
+
+  /* Core brand gradients: pink -> cream -> warm gold, matching the
+     reference-images/background pack. Used for hero panels and the
+     card-soft top-edge wash, not full-bleed under body text. */
+  --gradient-hero: linear-gradient(165deg, #ffd6e2 0%, #fff1e0 55%, #fffaf2 100%);
+  --gradient-glow: radial-gradient(circle at 50% 20%, #ffe9b8 0%, #ffd2de 48%, #fff9f1 100%);
 
   --shadow-soft: 0 20px 45px -20px rgba(32, 26, 16, 0.22);
   --shadow-softer: 0 6px 18px -10px rgba(32, 26, 16, 0.12);
@@ -50,10 +59,13 @@
   --color-terracotta-deep: #f0a17c;
   --color-sage: #5cc98d;
   --color-sage-deep: #7fe3ab;
-  --color-plum: #b491e8;
+  --color-rose: #d98aa8;
   --color-gold: #f2b968;
 
   --color-water: #5fc3f5;
+
+  --gradient-hero: linear-gradient(165deg, #4a2733 0%, #3a2a1c 55%, #211d16 100%);
+  --gradient-glow: radial-gradient(circle at 50% 20%, #4d3a1c 0%, #472530 48%, #211d16 100%);
 
   --shadow-soft: 0 24px 55px -18px rgba(0, 0, 0, 0.55);
   --shadow-softer: 0 8px 22px -12px rgba(0, 0, 0, 0.45);
@@ -77,7 +89,7 @@
   --color-terracotta-deep: var(--color-terracotta-deep);
   --color-sage: var(--color-sage);
   --color-sage-deep: var(--color-sage-deep);
-  --color-plum: var(--color-plum);
+  --color-rose: var(--color-rose);
   --color-gold: var(--color-gold);
   --color-water: var(--color-water);
 
@@ -100,9 +112,9 @@ body {
 :root[data-theme="dark"] body,
 .dark body {
   background-image:
-    radial-gradient(circle at 10% -5%, color-mix(in srgb, var(--color-plum) 22%, transparent), transparent 45%),
-    radial-gradient(circle at 92% 10%, color-mix(in srgb, var(--color-terracotta) 18%, transparent), transparent 42%),
-    radial-gradient(circle at 50% 105%, color-mix(in srgb, var(--color-water) 16%, transparent), transparent 50%);
+    radial-gradient(circle at 10% -5%, color-mix(in srgb, var(--color-blush) 20%, transparent), transparent 45%),
+    radial-gradient(circle at 92% 10%, color-mix(in srgb, var(--color-gold) 18%, transparent), transparent 42%),
+    radial-gradient(circle at 50% 105%, color-mix(in srgb, var(--color-rose) 18%, transparent), transparent 50%);
   background-attachment: fixed;
 }
 
@@ -117,7 +129,11 @@ body {
 }
 
 .card-soft {
-  background: var(--color-surface);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-blush) 16%, var(--color-surface)) 0%,
+    var(--color-surface) 55%
+  );
   border-radius: var(--radius-organic);
   box-shadow: var(--shadow-softer);
   border: 1px solid var(--color-border);

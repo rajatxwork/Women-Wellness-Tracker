@@ -150,8 +150,8 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div
-        className="relative overflow-hidden rounded-organic border border-border bg-cream-soft bg-cover bg-center p-5 sm:p-6"
-        style={{ backgroundImage: `url(${BRAND_ASSETS.bgWarm})` }}
+        className="relative overflow-hidden rounded-organic border border-border bg-cover bg-center p-5 sm:p-6"
+        style={{ backgroundImage: `url(${BRAND_ASSETS.gradientPinkCream}), var(--gradient-hero)` }}
       >
         <p className="text-xs font-semibold uppercase tracking-wide text-terracotta-deep">
           {format(new Date(), "EEEE, MMMM d")}

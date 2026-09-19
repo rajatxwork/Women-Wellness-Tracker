@@ -8,7 +8,7 @@ export function VideoLink({ exerciseName }: { exerciseName: string }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`Watch form video for ${exerciseName}`}
-      className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-plum transition-colors hover:bg-plum/15 hover:text-plum"
+      className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-rose transition-colors hover:bg-rose/15 hover:text-rose"
     >
       <PlayCircle size={20} strokeWidth={1.8} />
     </a>

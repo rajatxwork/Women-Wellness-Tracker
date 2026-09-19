@@ -10,7 +10,7 @@ export default function LibraryPage() {
         icon={BookOpen}
         title="Library"
         subtitle="The companion e-book, organized to read, filter, and put to use."
-        accentClass="bg-plum/20 text-plum"
+        accentClass="bg-rose/20 text-rose"
       />
       <Suspense fallback={null}>
         <LibraryView />

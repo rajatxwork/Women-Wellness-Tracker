@@ -238,7 +238,7 @@ export function WorkoutSessionForm({
                       className={cn(
                         "rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors",
                         entry.harderVariantMarkers.includes(marker.key)
-                          ? "bg-plum text-white"
+                          ? "bg-rose text-white"
                           : "bg-cream-soft text-ink-soft",
                       )}
                     >

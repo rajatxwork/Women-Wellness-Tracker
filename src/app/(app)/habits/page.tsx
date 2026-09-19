@@ -60,7 +60,7 @@ export default async function HabitsPage() {
         icon={ListChecks}
         title="Habits & Tasks"
         subtitle="Small, repeatable things, and the odd one-off to remember."
-        accentClass="bg-plum/15 text-plum"
+        accentClass="bg-rose/15 text-rose"
       />
 
       <Card>

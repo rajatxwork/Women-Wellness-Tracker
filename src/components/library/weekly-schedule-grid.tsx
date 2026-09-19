@@ -11,7 +11,7 @@ const TYPE_STYLES: Record<
   strength: { icon: Dumbbell, badge: "bg-terracotta/15 text-terracotta-deep", label: "Strength" },
   cardio: { icon: HeartPulse, badge: "bg-water/15 text-water", label: "Cardio" },
   recovery: { icon: Sparkles, badge: "bg-sage/15 text-sage-deep", label: "Recovery" },
-  rest: { icon: Moon, badge: "bg-plum/15 text-plum", label: "Rest" },
+  rest: { icon: Moon, badge: "bg-rose/15 text-rose", label: "Rest" },
 };
 
 export function WeeklyScheduleGrid() {
